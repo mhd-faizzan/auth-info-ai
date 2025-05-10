@@ -13,11 +13,26 @@ if 'logged_in' not in st.session_state:
 st.markdown("""
     <style>
         /* [Keep all your existing CSS styles] */
+        .model-badge {
+            background-color: #6e48aa;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            display: inline-block;
+            margin-left: 10px;
+        }
     </style>
 """, unsafe_allow_html=True)
 
 # Title of the app
-st.markdown("<div class='heading'>🔐 Welcome to InfoAI App!</div>", unsafe_allow_html=True)
+st.markdown("""
+    <div class='heading'>
+        🔐 Welcome to InfoAI App! 
+        <span class="model-badge">llama-3.3-70b-versatile</span>
+    </div>
+""", unsafe_allow_html=True)
 
 # Check if secrets are configured
 def check_secrets():
@@ -50,10 +65,13 @@ def firebase_signup(email, password):
             FIREBASE_SIGNUP_URL,
             json={"email": email, "password": password, "returnSecureToken": True}
         )
-        return response.json() if response.status_code == 200 else None
+        if response.status_code == 200:
+            return True, "Account created successfully!"
+        else:
+            error = response.json().get("error", {}).get("message", "Unknown error")
+            return False, f"Signup failed: {error}"
     except Exception as e:
-        st.error(f"Signup error: {str(e)}")
-        return None
+        return False, f"Connection error: {str(e)}"
 
 def firebase_login(email, password):
     try:
@@ -61,12 +79,15 @@ def firebase_login(email, password):
             FIREBASE_LOGIN_URL,
             json={"email": email, "password": password, "returnSecureToken": True}
         )
-        return response.json() if response.status_code == 200 else None
+        if response.status_code == 200:
+            return True, "Login successful!", response.json()
+        else:
+            error = response.json().get("error", {}).get("message", "Unknown error")
+            return False, f"Login failed: {error}", None
     except Exception as e:
-        st.error(f"Login error: {str(e)}")
-        return None
+        return False, f"Connection error: {str(e)}", None
 
-# LLM Query Function (Llama3-70b-8192)
+# LLM Query Function (Updated to llama-3.3-70b-versatile)
 def query_llama(prompt):
     headers = {
         "Authorization": f"Bearer {st.secrets.llama.api_key}",
@@ -74,10 +95,20 @@ def query_llama(prompt):
     }
     
     payload = {
-        "model": "llama3-70b-8192",
-        "messages": [{"role": "user", "content": prompt}],
+        "model": "llama-3.3-70b-versatile",  # Updated model name
+        "messages": [
+            {
+                "role": "system",
+                "content": "You are a helpful AI assistant. Provide detailed, accurate responses with examples when possible."
+            },
+            {
+                "role": "user",
+                "content": prompt
+            }
+        ],
         "temperature": 0.7,
-        "max_tokens": 1000
+        "max_tokens": 1500,  # Increased token limit for more detailed responses
+        "top_p": 0.9
     }
     
     try:
@@ -85,19 +116,20 @@ def query_llama(prompt):
             st.secrets.llama.api_url,
             headers=headers,
             json=payload,
-            timeout=30
+            timeout=45  # Increased timeout for larger model
         )
         
         if response.status_code == 200:
             data = response.json()
-            return data.get("choices", [{}])[0].get("message", {}).get("content", "No response")
+            return True, data.get("choices", [{}])[0].get("message", {}).get("content", "No response")
         else:
-            return f"Error: API returned status code {response.status_code}"
+            error_msg = response.json().get("error", {}).get("message", response.text)
+            return False, f"API Error ({response.status_code}): {error_msg}"
             
     except requests.exceptions.Timeout:
-        return "Error: Request timed out. Please try again."
+        return False, "Error: Request timed out. The model may need more time to respond."
     except Exception as e:
-        return f"Error: {str(e)}"
+        return False, f"Connection error: {str(e)}"
 
 # Authentication UI
 if not st.session_state.logged_in:
@@ -111,22 +143,26 @@ if not st.session_state.logged_in:
         if option == "Signup":
             if st.button("Create Account"):
                 if email and password:
-                    result = firebase_signup(email, password)
-                    if result:
-                        st.success("Account created! Please log in.")
+                    success, message = firebase_signup(email, password)
+                    if success:
+                        st.success(message)
+                    else:
+                        st.error(message)
                 else:
                     st.error("Please enter both email and password")
         
         if option == "Login":
             if st.button("Login"):
                 if email and password:
-                    result = firebase_login(email, password)
-                    if result:
+                    success, message, result = firebase_login(email, password)
+                    if success:
                         st.session_state.logged_in = True
                         st.session_state.email = email
                         st.session_state.id_token = result.get("idToken", "")
-                        st.success("Login successful!")
+                        st.success(message)
                         st.rerun()
+                    else:
+                        st.error(message)
                 else:
                     st.error("Please enter both email and password")
         
@@ -146,18 +182,23 @@ if st.session_state.logged_in:
             st.rerun()
     
     # AI Query Interface
-    user_input = st.text_area("Ask Llama3-70b anything", height=150,
-                            placeholder="Type your question here...")
+    user_input = st.text_area("Ask your question to llama-3.3-70b-versatile", 
+                            height=150,
+                            placeholder="Type your question here...",
+                            help="This advanced AI model can handle complex queries")
     
     if st.button("Get Answer", use_container_width=True) and user_input:
-        with st.spinner("Llama3 is thinking..."):
+        with st.spinner(f"llama-3.3-70b-versatile is generating your answer..."):
             start_time = datetime.now()
-            response = query_llama(user_input)
+            success, response = query_llama(user_input)
             response_time = (datetime.now() - start_time).total_seconds()
             
             st.markdown("<div class='response-box'>", unsafe_allow_html=True)
-            st.write(f"**Llama3-70b Response ({response_time:.2f}s):**")
-            st.write(response)
+            if success:
+                st.write(f"**Response (generated in {response_time:.2f}s):**")
+                st.write(response)
+            else:
+                st.error(response)
             st.markdown("</div>", unsafe_allow_html=True)
 
 else:
@@ -167,6 +208,6 @@ else:
 st.markdown("---")
 st.markdown("""
     <div style="text-align: center; color: gray; font-size: 12px;">
-    Powered by Streamlit, Firebase, and Llama3-70b-8192
+    Powered by Streamlit, Firebase, and llama-3.3-70b-versatile
     </div>
 """, unsafe_allow_html=True)
