@@ -1,6 +1,1 @@
-streamlit
-pandas
-requests
-pyrebase
-openai
-llama3-70b-8192
+
