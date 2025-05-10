@@ -167,7 +167,7 @@ if st.session_state.logged_in:
 
     if user_input:
         llama_api_key = st.secrets["llama"]["api_key"]
-        llama_model = st.secrets["llama"]["model"]
+        llama_model = "llama-3.3-70b-versatile"  # Use the Llama model you mentioned
         
         model_response, reference = query_llama_model(user_input, llama_api_key, llama_model)
         
