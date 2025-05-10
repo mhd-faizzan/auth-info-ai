@@ -1,4 +1,5 @@
 import streamlit as st
+import pyrebase
 import requests
 import json
 
@@ -63,35 +64,63 @@ st.markdown("""
 # Title of the app
 st.markdown("<div class='heading'>🔐 Welcome to InfoAI App!</div>", unsafe_allow_html=True)
 
-# Login functionality
-if st.session_state.logged_in:
-    st.subheader(f"Welcome, {st.session_state.email}")
-    
-    user_input = st.text_input("Ask the AI model anything")
+# Firebase Authentication - Login or Signup
+option = st.selectbox("Choose an option", ["Login", "Signup"])
 
-    if user_input:
-        llama_api_key = st.secrets["llama"]["api_key"]
-        llama_model = "llama-3.3-70b-versatile"  # Use the Llama model you mentioned
-        
-        model_response, reference = query_llama_model(user_input, llama_api_key, llama_model)
-        
-        st.markdown("<div class='response-box'>", unsafe_allow_html=True)
-        st.write(f"**AI Response**: {model_response}")
-        st.write(f"**Reference**: {reference}")
-        st.markdown("</div>", unsafe_allow_html=True)
-    
-    if st.button("Logout", key="logout", help="Logout from your account", use_container_width=True):
-        st.session_state.logged_in = False
-        st.session_state.email = ""
-        st.write("You have been logged out.")
+# Input fields for email and password inside a styled container
+with st.container():
+    st.markdown("<div class='login-container'>", unsafe_allow_html=True)
+    email = st.text_input("Email")
+    password = st.text_input("Password", type="password")
 
-else:
-    st.info("Please login to access the AI model.")
+    # Function to initialize Firebase with credentials from Streamlit secrets
+    def initialize_firebase():
+        try:
+            firebase_config = {
+                "apiKey": st.secrets["firebase"]["api_key"],
+                "authDomain": st.secrets["firebase"]["auth_domain"],
+                "projectId": st.secrets["firebase"]["project_id"],
+                "storageBucket": st.secrets["firebase"]["storage_bucket"],
+                "messagingSenderId": st.secrets["firebase"]["messaging_sender_id"],
+                "appId": st.secrets["firebase"]["app_id"],
+                "measurementId": st.secrets["firebase"]["measurement_id"]
+            }
+            firebase = pyrebase.initialize_app(firebase_config)
+            return firebase.auth()
+        except Exception as e:
+            st.error("Error initializing Firebase.")
+            st.exception(e)
 
-# Function to query the Llama model API using Streamlit secrets
+    # Signup functionality
+    if option == "Signup":
+        if st.button("Create Account", key="signup", help="Create a new account"):
+            try:
+                auth = initialize_firebase()
+                auth.create_user_with_email_and_password(email, password)
+                st.success("Account created! Please log in.")
+            except Exception as e:
+                st.error("Failed to create account.")
+                st.exception(e)
+
+    # Login functionality
+    if option == "Login":
+        if st.button("Login", key="login", help="Login to your account"):
+            try:
+                auth = initialize_firebase()
+                user = auth.sign_in_with_email_and_password(email, password)
+                st.success("Login successful!")
+                st.session_state.logged_in = True
+                st.session_state.email = email
+            except Exception as e:
+                st.error("Invalid credentials or network issue.")
+                st.exception(e)
+
+    st.markdown("</div>", unsafe_allow_html=True)
+
+# Function to query the Llama3-70b-8192 model API using Streamlit secrets
 def query_llama_model(query, api_key, model):
     try:
-        url = "https://api.llama.com/v1/query"  # Replace with actual Llama API endpoint
+        url = "https://api.llama.com/v1/query"  # Replace with the actual Llama API endpoint for llama3-70b-8192
 
         headers = {
             "Authorization": f"Bearer {api_key}",
@@ -129,3 +158,28 @@ def query_llama_model(query, api_key, model):
         st.error("Unexpected error occurred.")
         st.exception(e)
         return "Unexpected error", "No reference"
+
+# Protect access to the Llama model AI interface
+if st.session_state.logged_in:
+    st.subheader(f"Welcome, {st.session_state.email}")
+    
+    user_input = st.text_input("Ask the AI model anything")
+
+    if user_input:
+        llama_api_key = st.secrets["llama"]["api_key"]  # Fetch the llama3-70b-8192 API key from Streamlit secrets
+        llama_model = "llama3-70b-8192"  # Use the new model name here
+        
+        model_response, reference = query_llama_model(user_input, llama_api_key, llama_model)
+        
+        st.markdown("<div class='response-box'>", unsafe_allow_html=True)
+        st.write(f"**AI Response**: {model_response}")
+        st.write(f"**Reference**: {reference}")
+        st.markdown("</div>", unsafe_allow_html=True)
+    
+    if st.button("Logout", key="logout", help="Logout from your account", use_container_width=True):
+        st.session_state.logged_in = False
+        st.session_state.email = ""
+        st.write("You have been logged out.")
+
+else:
+    st.info("Please login to access the AI model.")
