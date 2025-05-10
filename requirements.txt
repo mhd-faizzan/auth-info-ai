@@ -1,6 +1,6 @@
-streamlit==1.28.0
-pandas==1.5.3
-requests==2.26.0
-pyrebase==5.0.0
-openai==0.27.0
-llama3-70b-8192==1.0.0  # Example, make sure the Llama model library is specified correctly
+streamlit
+pandas
+requests
+pyrebase
+openai
+llama3-70b-8192
