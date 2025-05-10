@@ -2,64 +2,123 @@ import streamlit as st
 import requests
 from datetime import datetime
 
-# Initialize session state
+# ======================
+# APP CONFIGURATION
+# ======================
+st.set_page_config(page_title="AuthenticInfo AI", page_icon="🔍")
+
+# ======================
+# SESSION STATE
+# ======================
 if 'logged_in' not in st.session_state:
     st.session_state.logged_in = False
     st.session_state.email = ""
 
-# Custom CSS with source styling
+# ======================
+# STYLES
+# ======================
 st.markdown("""
     <style>
+        /* Main containers */
+        .auth-container {
+            max-width: 500px;
+            margin: 2rem auto;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        /* Source styling */
         .source-box {
             background-color: #f8f9fa;
             border-left: 4px solid #6c757d;
-            padding: 12px;
-            margin-top: 15px;
-            font-size: 14px;
+            padding: 1rem;
+            margin-top: 1.5rem;
         }
         .source-title {
-            font-weight: bold;
+            font-weight: 700;
             color: #2c3e50;
+            margin-bottom: 0.5rem;
         }
         .source-item {
-            margin: 5px 0;
+            margin: 0.5rem 0;
+            padding-left: 1rem;
+            border-left: 2px solid #dee2e6;
+        }
+        
+        /* Response metrics */
+        .metrics {
+            font-size: 0.85rem;
+            color: #6c757d;
+            margin-top: 0.5rem;
         }
     </style>
 """, unsafe_allow_html=True)
 
-# Title with model info
-st.markdown("""
-    <div style="display: flex; align-items: center; gap: 10px;">
-        <h1>🔍 AuthenticInfo AI</h1>
-        <span style="background: #6e48aa; color: white; padding: 3px 8px; border-radius: 12px; font-size: 14px;">
-            llama-3.3-70b-versatile
-        </span>
-    </div>
-    <p style="color: #666;">Always providing sourced information</p>
-""", unsafe_allow_html=True)
-
-# Enhanced query function with source requirements
-def query_llama(prompt):
-    SYSTEM_PROMPT = """You are a fact-checking AI assistant. Always:
-    1. Provide accurate, up-to-date information
-    2. Include 2-3 verifiable sources
-    3. Format sources clearly as:
-       • [Title](URL) - Publisher/Author (Year)
-    4. For technical topics, prefer academic papers
-    5. For news, cite primary sources
-    6. If unsure, state "Could not verify"
+# ======================
+# FIREBASE AUTH
+# ======================
+def initialize_firebase():
+    if "firebase" not in st.secrets:
+        st.error("Firebase configuration missing!")
+        st.stop()
     
-    Current date: {date}""".format(date=datetime.now().strftime("%Y-%m-%d"))
+    config = {
+        "apiKey": st.secrets.firebase.api_key,
+        "authDomain": st.secrets.firebase.auth_domain,
+        "projectId": st.secrets.firebase.project_id
+    }
+    return config
+
+firebase_config = initialize_firebase()
+
+def firebase_signup(email, password):
+    try:
+        response = requests.post(
+            f"https://identitytoolkit.googleapis.com/v1/accounts:signUp?key={firebase_config['apiKey']}",
+            json={"email": email, "password": password, "returnSecureToken": True}
+        )
+        return response.json() if response.status_code == 200 else None
+    except Exception as e:
+        st.error(f"Signup error: {str(e)}")
+        return None
+
+def firebase_login(email, password):
+    try:
+        response = requests.post(
+            f"https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={firebase_config['apiKey']}",
+            json={"email": email, "password": password, "returnSecureToken": True}
+        )
+        return response.json() if response.status_code == 200 else None
+    except Exception as e:
+        st.error(f"Login error: {str(e)}")
+        return None
+
+# ======================
+# LLM QUERY WITH SOURCES
+# ======================
+def get_verified_response(prompt):
+    """Get response with guaranteed sources"""
+    SYSTEM_PROMPT = f"""You are a fact-checking AI. For every response:
+1. Provide accurate information as of {datetime.now().strftime('%Y-%m-%d')}
+2. Include 2-3 authoritative sources formatted as:
+   • [Title](URL) - Author/Organization (Year)
+3. Prefer:
+   - .edu/.gov domains
+   - Peer-reviewed papers (DOI links)
+   - Primary sources
+4. If sources unavailable, state "Could not verify from authoritative sources"
+
+Separate sources with "### SOURCES ###" exactly."""
 
     payload = {
         "model": "llama-3.3-70b-versatile",
         "messages": [
             {"role": "system", "content": SYSTEM_PROMPT},
-            {"role": "user", "content": prompt + "\n\nPlease provide sources in the requested format."}
+            {"role": "user", "content": prompt}
         ],
-        "temperature": 0.5,  # Lower for more factual responses
-        "max_tokens": 2000,
-        "response_format": {"type": "text"}
+        "temperature": 0.3,
+        "max_tokens": 2000
     }
 
     try:
@@ -72,44 +131,112 @@ def query_llama(prompt):
         
         if response.status_code == 200:
             content = response.json()["choices"][0]["message"]["content"]
-            return extract_response_and_sources(content)
-        else:
-            return None, [f"API Error: {response.status_code}"]
-            
+            if "### SOURCES ###" in content:
+                response_text, sources = content.split("### SOURCES ###")
+                return response_text.strip(), [s.strip() for s in sources.split("•") if s.strip()]
+            return content, []
+        return None, [f"API Error: {response.status_code}"]
     except Exception as e:
-        return None, [f"Error: {str(e)}"]
+        return None, [f"Connection error: {str(e)}"]
 
-def extract_response_and_sources(content):
-    """Separates main response from sources"""
-    if "Sources:" in content:
-        parts = content.split("Sources:")
-        return parts[0].strip(), [s.strip() for s in parts[1].split("•") if s.strip()]
-    return content, ["No sources provided"]
-
-# Main app interface
-if st.session_state.logged_in:
-    user_input = st.text_area("Ask for verified information:", height=150)
+# ======================
+# AUTHENTICATION UI
+# ======================
+if not st.session_state.logged_in:
+    st.markdown("""
+        <div style="text-align: center; margin-bottom: 2rem;">
+            <h1>🔐 AuthenticInfo AI</h1>
+            <p>Access verified information with sources</p>
+        </div>
+    """, unsafe_allow_html=True)
     
-    if st.button("Get Verified Answer"):
-        with st.spinner("🔎 Verifying information..."):
-            start_time = datetime.now()
-            response, sources = query_llama(user_input)
-            response_time = (datetime.now() - start_time).total_seconds()
-            
-            if response:
-                st.markdown(f"**Verified Answer ({response_time:.1f}s):**")
-                st.write(response)
-                
-                if sources and sources[0] != "No sources provided":
-                    st.markdown("---")
-                    st.markdown("""
-                        <div class="source-box">
-                            <div class="source-title">📚 Verified Sources</div>
-                            {}
-                        </div>
-                    """.format("".join([f'<div class="source-item">• {s}</div>' for s in sources])), 
-                    unsafe_allow_html=True)
-            else:
-                st.error("Failed to get response")
+    with st.container():
+        st.markdown("<div class='auth-container'>", unsafe_allow_html=True)
+        
+        tab1, tab2 = st.tabs(["Login", "Sign Up"])
+        
+        with tab1:
+            email = st.text_input("Email", key="login_email")
+            password = st.text_input("Password", type="password", key="login_pass")
+            if st.button("Login", use_container_width=True):
+                if not email or not password:
+                    st.error("Please enter both email and password")
+                else:
+                    result = firebase_login(email, password)
+                    if result:
+                        st.session_state.logged_in = True
+                        st.session_state.email = email
+                        st.rerun()
+        
+        with tab2:
+            email = st.text_input("Email", key="signup_email")
+            password = st.text_input("Password", type="password", key="signup_pass")
+            if st.button("Create Account", use_container_width=True):
+                if not email or not password:
+                    st.error("Please enter both email and password")
+                else:
+                    result = firebase_signup(email, password)
+                    if result:
+                        st.success("Account created! Please login.")
+        
+        st.markdown("</div>", unsafe_allow_html=True)
 
-# [Keep your existing Firebase authentication code]
+# ======================
+# MAIN APP INTERFACE
+# ======================
+else:
+    # Header
+    col1, col2 = st.columns([4, 1])
+    with col1:
+        st.markdown(f"# Welcome back, {st.session_state.email}!")
+    with col2:
+        if st.button("Logout", type="primary"):
+            st.session_state.logged_in = False
+            st.rerun()
+    
+    st.markdown("---")
+    
+    # Query Interface
+    prompt = st.text_area(
+        "Ask for verified information:",
+        placeholder="e.g. 'Explain quantum computing with sources'",
+        height=150
+    )
+    
+    if st.button("Get Verified Answer", type="primary", use_container_width=True):
+        if not prompt:
+            st.warning("Please enter a question")
+        else:
+            with st.spinner("🔍 Verifying information from authoritative sources..."):
+                start_time = datetime.now()
+                response, sources = get_verified_response(prompt)
+                response_time = (datetime.now() - start_time).total_seconds()
+                
+                if response:
+                    st.markdown("### Verified Response")
+                    st.write(response)
+                    st.markdown(f"<div class='metrics'>Generated in {response_time:.1f} seconds</div>", 
+                               unsafe_allow_html=True)
+                    
+                    if sources:
+                        st.markdown("""
+                            <div class="source-box">
+                                <div class="source-title">📚 Verification Sources</div>
+                                {}
+                            </div>
+                        """.format("".join([f'<div class="source-item">• {s}</div>' for s in sources])), 
+                        unsafe_allow_html=True)
+                    elif "could not verify" not in response.lower():
+                        st.warning("No sources provided - verify independently")
+                else:
+                    st.error("Failed to get response")
+
+# ======================
+# FOOTER
+# ======================
+st.markdown("---")
+st.markdown("""
+    <div style="text-align: center; color: #6c757d; font-size: 0.9rem;">
+        AuthenticInfo AI • Always sourced • {date}
+    </div>
+""".format(date=datetime.now().strftime("%Y")), unsafe_allow_html=True)
