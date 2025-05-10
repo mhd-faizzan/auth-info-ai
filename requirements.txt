@@ -1,8 +1,8 @@
 streamlit==1.28.0
-pandas==1.5.3
+pandas==1.5.2
 langchain==0.0.219
 openai==0.27.0
-pinecone-client>=2.2.2  # Use compatible version
+pinecone-client>=2.2.2
 streamlit-chat==0.0.1
 python-dotenv==1.0.0
 faiss-cpu==1.7.2
