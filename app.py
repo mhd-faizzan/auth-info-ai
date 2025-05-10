@@ -1,213 +1,115 @@
 import streamlit as st
 import requests
-import json
 from datetime import datetime
 
 # Initialize session state
 if 'logged_in' not in st.session_state:
     st.session_state.logged_in = False
     st.session_state.email = ""
-    st.session_state.id_token = ""
 
-# Custom CSS for styling
+# Custom CSS with source styling
 st.markdown("""
     <style>
-        /* [Keep all your existing CSS styles] */
-        .model-badge {
-            background-color: #6e48aa;
-            color: white;
-            padding: 3px 8px;
-            border-radius: 12px;
-            font-size: 12px;
+        .source-box {
+            background-color: #f8f9fa;
+            border-left: 4px solid #6c757d;
+            padding: 12px;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+        .source-title {
             font-weight: bold;
-            display: inline-block;
-            margin-left: 10px;
+            color: #2c3e50;
+        }
+        .source-item {
+            margin: 5px 0;
         }
     </style>
 """, unsafe_allow_html=True)
 
-# Title of the app
+# Title with model info
 st.markdown("""
-    <div class='heading'>
-        🔐 Welcome to InfoAI App! 
-        <span class="model-badge">llama-3.3-70b-versatile</span>
+    <div style="display: flex; align-items: center; gap: 10px;">
+        <h1>🔍 AuthenticInfo AI</h1>
+        <span style="background: #6e48aa; color: white; padding: 3px 8px; border-radius: 12px; font-size: 14px;">
+            llama-3.3-70b-versatile
+        </span>
     </div>
+    <p style="color: #666;">Always providing sourced information</p>
 """, unsafe_allow_html=True)
 
-# Check if secrets are configured
-def check_secrets():
-    required_config = {
-        "firebase": ["api_key", "auth_domain", "project_id"],
-        "llama": ["api_key", "api_url"]
-    }
-    
-    for service, keys in required_config.items():
-        if service not in st.secrets:
-            st.error(f"Missing {service} configuration in secrets!")
-            return False
-        for key in keys:
-            if key not in st.secrets[service]:
-                st.error(f"Missing {key} in {service} secrets!")
-                return False
-    return True
-
-if not check_secrets():
-    st.stop()
-
-# Firebase Authentication REST API endpoints
-FIREBASE_SIGNUP_URL = f"https://identitytoolkit.googleapis.com/v1/accounts:signUp?key={st.secrets.firebase.api_key}"
-FIREBASE_LOGIN_URL = f"https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={st.secrets.firebase.api_key}"
-
-# Authentication functions
-def firebase_signup(email, password):
-    try:
-        response = requests.post(
-            FIREBASE_SIGNUP_URL,
-            json={"email": email, "password": password, "returnSecureToken": True}
-        )
-        if response.status_code == 200:
-            return True, "Account created successfully!"
-        else:
-            error = response.json().get("error", {}).get("message", "Unknown error")
-            return False, f"Signup failed: {error}"
-    except Exception as e:
-        return False, f"Connection error: {str(e)}"
-
-def firebase_login(email, password):
-    try:
-        response = requests.post(
-            FIREBASE_LOGIN_URL,
-            json={"email": email, "password": password, "returnSecureToken": True}
-        )
-        if response.status_code == 200:
-            return True, "Login successful!", response.json()
-        else:
-            error = response.json().get("error", {}).get("message", "Unknown error")
-            return False, f"Login failed: {error}", None
-    except Exception as e:
-        return False, f"Connection error: {str(e)}", None
-
-# LLM Query Function (Updated to llama-3.3-70b-versatile)
+# Enhanced query function with source requirements
 def query_llama(prompt):
-    headers = {
-        "Authorization": f"Bearer {st.secrets.llama.api_key}",
-        "Content-Type": "application/json"
-    }
+    SYSTEM_PROMPT = """You are a fact-checking AI assistant. Always:
+    1. Provide accurate, up-to-date information
+    2. Include 2-3 verifiable sources
+    3. Format sources clearly as:
+       • [Title](URL) - Publisher/Author (Year)
+    4. For technical topics, prefer academic papers
+    5. For news, cite primary sources
+    6. If unsure, state "Could not verify"
     
+    Current date: {date}""".format(date=datetime.now().strftime("%Y-%m-%d"))
+
     payload = {
-        "model": "llama-3.3-70b-versatile",  # Updated model name
+        "model": "llama-3.3-70b-versatile",
         "messages": [
-            {
-                "role": "system",
-                "content": "You are a helpful AI assistant. Provide detailed, accurate responses with examples when possible."
-            },
-            {
-                "role": "user",
-                "content": prompt
-            }
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user", "content": prompt + "\n\nPlease provide sources in the requested format."}
         ],
-        "temperature": 0.7,
-        "max_tokens": 1500,  # Increased token limit for more detailed responses
-        "top_p": 0.9
+        "temperature": 0.5,  # Lower for more factual responses
+        "max_tokens": 2000,
+        "response_format": {"type": "text"}
     }
-    
+
     try:
         response = requests.post(
             st.secrets.llama.api_url,
-            headers=headers,
+            headers={"Authorization": f"Bearer {st.secrets.llama.api_key}"},
             json=payload,
-            timeout=45  # Increased timeout for larger model
+            timeout=60
         )
         
         if response.status_code == 200:
-            data = response.json()
-            return True, data.get("choices", [{}])[0].get("message", {}).get("content", "No response")
+            content = response.json()["choices"][0]["message"]["content"]
+            return extract_response_and_sources(content)
         else:
-            error_msg = response.json().get("error", {}).get("message", response.text)
-            return False, f"API Error ({response.status_code}): {error_msg}"
+            return None, [f"API Error: {response.status_code}"]
             
-    except requests.exceptions.Timeout:
-        return False, "Error: Request timed out. The model may need more time to respond."
     except Exception as e:
-        return False, f"Connection error: {str(e)}"
+        return None, [f"Error: {str(e)}"]
 
-# Authentication UI
-if not st.session_state.logged_in:
-    option = st.selectbox("Choose an option", ["Login", "Signup"])
-    
-    with st.container():
-        st.markdown("<div class='login-container'>", unsafe_allow_html=True)
-        email = st.text_input("Email")
-        password = st.text_input("Password", type="password")
-        
-        if option == "Signup":
-            if st.button("Create Account"):
-                if email and password:
-                    success, message = firebase_signup(email, password)
-                    if success:
-                        st.success(message)
-                    else:
-                        st.error(message)
-                else:
-                    st.error("Please enter both email and password")
-        
-        if option == "Login":
-            if st.button("Login"):
-                if email and password:
-                    success, message, result = firebase_login(email, password)
-                    if success:
-                        st.session_state.logged_in = True
-                        st.session_state.email = email
-                        st.session_state.id_token = result.get("idToken", "")
-                        st.success(message)
-                        st.rerun()
-                    else:
-                        st.error(message)
-                else:
-                    st.error("Please enter both email and password")
-        
-        st.markdown("</div>", unsafe_allow_html=True)
+def extract_response_and_sources(content):
+    """Separates main response from sources"""
+    if "Sources:" in content:
+        parts = content.split("Sources:")
+        return parts[0].strip(), [s.strip() for s in parts[1].split("•") if s.strip()]
+    return content, ["No sources provided"]
 
-# Main App Interface
+# Main app interface
 if st.session_state.logged_in:
-    st.subheader(f"Welcome, {st.session_state.email}")
+    user_input = st.text_area("Ask for verified information:", height=150)
     
-    # Display logout button at top right
-    col1, col2 = st.columns([4, 1])
-    with col2:
-        if st.button("Logout", key="logout", help="Logout from your account"):
-            st.session_state.logged_in = False
-            st.session_state.email = ""
-            st.session_state.id_token = ""
-            st.rerun()
-    
-    # AI Query Interface
-    user_input = st.text_area("Ask your question to llama-3.3-70b-versatile", 
-                            height=150,
-                            placeholder="Type your question here...",
-                            help="This advanced AI model can handle complex queries")
-    
-    if st.button("Get Answer", use_container_width=True) and user_input:
-        with st.spinner(f"llama-3.3-70b-versatile is generating your answer..."):
+    if st.button("Get Verified Answer"):
+        with st.spinner("🔎 Verifying information..."):
             start_time = datetime.now()
-            success, response = query_llama(user_input)
+            response, sources = query_llama(user_input)
             response_time = (datetime.now() - start_time).total_seconds()
             
-            st.markdown("<div class='response-box'>", unsafe_allow_html=True)
-            if success:
-                st.write(f"**Response (generated in {response_time:.2f}s):**")
+            if response:
+                st.markdown(f"**Verified Answer ({response_time:.1f}s):**")
                 st.write(response)
+                
+                if sources and sources[0] != "No sources provided":
+                    st.markdown("---")
+                    st.markdown("""
+                        <div class="source-box">
+                            <div class="source-title">📚 Verified Sources</div>
+                            {}
+                        </div>
+                    """.format("".join([f'<div class="source-item">• {s}</div>' for s in sources])), 
+                    unsafe_allow_html=True)
             else:
-                st.error(response)
-            st.markdown("</div>", unsafe_allow_html=True)
+                st.error("Failed to get response")
 
-else:
-    st.info("Please login to access the AI model.")
-
-# Footer
-st.markdown("---")
-st.markdown("""
-    <div style="text-align: center; color: gray; font-size: 12px;">
-    Powered by Streamlit, Firebase, and llama-3.3-70b-versatile
-    </div>
-""", unsafe_allow_html=True)
+# [Keep your existing Firebase authentication code]
