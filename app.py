@@ -1,5 +1,4 @@
 import streamlit as st
-import pyrebase
 import requests
 import json
 from datetime import datetime
@@ -8,62 +7,12 @@ from datetime import datetime
 if 'logged_in' not in st.session_state:
     st.session_state.logged_in = False
     st.session_state.email = ""
-    st.session_state.auth_token = None
+    st.session_state.id_token = ""
 
 # Custom CSS for styling
 st.markdown("""
     <style>
-        .main {
-            text-align: center;
-            padding: 30px;
-        }
-        .login-form {
-            margin-top: 30px;
-        }
-        .login-container {
-            background-color: #f1f1f1;
-            padding: 20px;
-            border-radius: 10px;
-            width: 100%;
-            max-width: 400px;
-            margin: 0 auto;
-        }
-        .button {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 5px;
-            font-size: 16px;
-            cursor: pointer;
-            border: none;
-        }
-        .button:hover {
-            background-color: #45a049;
-        }
-        .logout-btn {
-            background-color: #ff4d4d;
-        }
-        .logout-btn:hover {
-            background-color: #ff3333;
-        }
-        .heading {
-            font-size: 30px;
-            font-weight: bold;
-            color: #2C3E50;
-        }
-        .response-box {
-            margin-top: 20px;
-            padding: 15px;
-            border-radius: 10px;
-            background-color: #ecf0f1;
-            max-width: 800px;
-            margin: auto;
-            word-wrap: break-word;
-        }
-        .error {
-            color: red;
-            font-weight: bold;
-        }
+        /* [Keep all your existing CSS styles] */
     </style>
 """, unsafe_allow_html=True)
 
@@ -72,85 +21,66 @@ st.markdown("<div class='heading'>🔐 Welcome to InfoAI App!</div>", unsafe_all
 
 # Check if secrets are configured
 def check_secrets():
-    required_secrets = {
-        'firebase': ['api_key', 'auth_domain', 'project_id', 'storage_bucket', 
-                    'messaging_sender_id', 'app_id', 'measurement_id'],
-        'llama': ['api_key', 'api_url']
+    required_config = {
+        "firebase": ["api_key", "auth_domain", "project_id"],
+        "llama": ["api_key", "api_url"]
     }
     
-    for category, keys in required_secrets.items():
-        if category not in st.secrets:
-            st.error(f"Missing {category} configuration in secrets!")
+    for service, keys in required_config.items():
+        if service not in st.secrets:
+            st.error(f"Missing {service} configuration in secrets!")
             return False
         for key in keys:
-            if key not in st.secrets[category]:
-                st.error(f"Missing {key} in {category} secrets!")
+            if key not in st.secrets[service]:
+                st.error(f"Missing {key} in {service} secrets!")
                 return False
     return True
 
 if not check_secrets():
     st.stop()
 
-# Initialize Firebase
-def initialize_firebase():
-    try:
-        firebase_config = {
-            "apiKey": st.secrets.firebase.api_key,
-            "authDomain": st.secrets.firebase.auth_domain,
-            "projectId": st.secrets.firebase.project_id,
-            "storageBucket": st.secrets.firebase.storage_bucket,
-            "messagingSenderId": st.secrets.firebase.messaging_sender_id,
-            "appId": st.secrets.firebase.app_id,
-            "measurementId": st.secrets.firebase.measurement_id
-        }
-        return pyrebase.initialize_app(firebase_config).auth()
-    except Exception as e:
-        st.error(f"Firebase initialization failed: {str(e)}")
-        st.stop()
-
-auth = initialize_firebase()
+# Firebase Authentication REST API endpoints
+FIREBASE_SIGNUP_URL = f"https://identitytoolkit.googleapis.com/v1/accounts:signUp?key={st.secrets.firebase.api_key}"
+FIREBASE_LOGIN_URL = f"https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={st.secrets.firebase.api_key}"
 
 # Authentication functions
-def handle_signup(email, password):
+def firebase_signup(email, password):
     try:
-        auth.create_user_with_email_and_password(email, password)
-        st.success("Account created successfully! Please log in.")
-    except requests.exceptions.HTTPError as e:
-        error_json = e.args[1]
-        error = json.loads(error_json)['error']
-        st.error(f"Signup failed: {error.get('message', 'Unknown error')}")
+        response = requests.post(
+            FIREBASE_SIGNUP_URL,
+            json={"email": email, "password": password, "returnSecureToken": True}
+        )
+        return response.json() if response.status_code == 200 else None
     except Exception as e:
-        st.error(f"Signup failed: {str(e)}")
+        st.error(f"Signup error: {str(e)}")
+        return None
 
-def handle_login(email, password):
+def firebase_login(email, password):
     try:
-        user = auth.sign_in_with_email_and_password(email, password)
-        st.session_state.logged_in = True
-        st.session_state.email = email
-        st.session_state.auth_token = user['idToken']
-        st.success("Login successful!")
-    except requests.exceptions.HTTPError as e:
-        error_json = e.args[1]
-        error = json.loads(error_json)['error']
-        st.error(f"Login failed: {error.get('message', 'Unknown error')}")
+        response = requests.post(
+            FIREBASE_LOGIN_URL,
+            json={"email": email, "password": password, "returnSecureToken": True}
+        )
+        return response.json() if response.status_code == 200 else None
     except Exception as e:
-        st.error(f"Login failed: {str(e)}")
+        st.error(f"Login error: {str(e)}")
+        return None
 
-# Query Llama3 model (using example API structure)
-def query_llama_model(prompt):
+# LLM Query Function (Llama3-70b-8192)
+def query_llama(prompt):
+    headers = {
+        "Authorization": f"Bearer {st.secrets.llama.api_key}",
+        "Content-Type": "application/json"
+    }
+    
+    payload = {
+        "model": "llama3-70b-8192",
+        "messages": [{"role": "user", "content": prompt}],
+        "temperature": 0.7,
+        "max_tokens": 1000
+    }
+    
     try:
-        headers = {
-            "Authorization": f"Bearer {st.secrets.llama.api_key}",
-            "Content-Type": "application/json"
-        }
-        
-        payload = {
-            "model": "llama3-70b-8192",
-            "messages": [{"role": "user", "content": prompt}],
-            "max_tokens": 500,
-            "temperature": 0.7
-        }
-        
         response = requests.post(
             st.secrets.llama.api_url,
             headers=headers,
@@ -160,14 +90,14 @@ def query_llama_model(prompt):
         
         if response.status_code == 200:
             data = response.json()
-            return data.get("choices", [{}])[0].get("message", {}).get("content", "No response"), ""
+            return data.get("choices", [{}])[0].get("message", {}).get("content", "No response")
         else:
-            return f"API Error: {response.status_code}", response.text
+            return f"Error: API returned status code {response.status_code}"
             
     except requests.exceptions.Timeout:
-        return "Error: Request timed out. Please try again.", ""
+        return "Error: Request timed out. Please try again."
     except Exception as e:
-        return f"Error: {str(e)}", ""
+        return f"Error: {str(e)}"
 
 # Authentication UI
 if not st.session_state.logged_in:
@@ -181,14 +111,22 @@ if not st.session_state.logged_in:
         if option == "Signup":
             if st.button("Create Account"):
                 if email and password:
-                    handle_signup(email, password)
+                    result = firebase_signup(email, password)
+                    if result:
+                        st.success("Account created! Please log in.")
                 else:
                     st.error("Please enter both email and password")
         
         if option == "Login":
             if st.button("Login"):
                 if email and password:
-                    handle_login(email, password)
+                    result = firebase_login(email, password)
+                    if result:
+                        st.session_state.logged_in = True
+                        st.session_state.email = email
+                        st.session_state.id_token = result.get("idToken", "")
+                        st.success("Login successful!")
+                        st.rerun()
                 else:
                     st.error("Please enter both email and password")
         
@@ -204,27 +142,22 @@ if st.session_state.logged_in:
         if st.button("Logout", key="logout", help="Logout from your account"):
             st.session_state.logged_in = False
             st.session_state.email = ""
-            st.session_state.auth_token = None
+            st.session_state.id_token = ""
             st.rerun()
     
     # AI Query Interface
-    user_input = st.text_area("Ask the AI model anything", height=150)
+    user_input = st.text_area("Ask Llama3-70b anything", height=150,
+                            placeholder="Type your question here...")
     
     if st.button("Get Answer", use_container_width=True) and user_input:
-        with st.spinner("Generating response..."):
+        with st.spinner("Llama3 is thinking..."):
             start_time = datetime.now()
-            model_response, error_detail = query_llama_model(user_input)
+            response = query_llama(user_input)
             response_time = (datetime.now() - start_time).total_seconds()
             
             st.markdown("<div class='response-box'>", unsafe_allow_html=True)
-            st.write(f"**AI Response (generated in {response_time:.2f}s):**")
-            st.write(model_response)
-            
-            if error_detail:
-                st.markdown("---")
-                st.write("**Error Details:**")
-                st.code(error_detail, language='json')
-            
+            st.write(f"**Llama3-70b Response ({response_time:.2f}s):**")
+            st.write(response)
             st.markdown("</div>", unsafe_allow_html=True)
 
 else:
@@ -234,6 +167,6 @@ else:
 st.markdown("---")
 st.markdown("""
     <div style="text-align: center; color: gray; font-size: 12px;">
-    InfoAI App | Powered by Streamlit, Firebase, and Llama3
+    Powered by Streamlit, Firebase, and Llama3-70b-8192
     </div>
 """, unsafe_allow_html=True)
