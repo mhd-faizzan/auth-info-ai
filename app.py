@@ -75,17 +75,21 @@ with st.container():
 
     # Function to initialize Firebase with credentials from Streamlit secrets
     def initialize_firebase():
-        firebase_config = {
-            "apiKey": st.secrets["firebase"]["api_key"],
-            "authDomain": st.secrets["firebase"]["auth_domain"],
-            "projectId": st.secrets["firebase"]["project_id"],
-            "storageBucket": st.secrets["firebase"]["storage_bucket"],
-            "messagingSenderId": st.secrets["firebase"]["messaging_sender_id"],
-            "appId": st.secrets["firebase"]["app_id"],
-            "measurementId": st.secrets["firebase"]["measurement_id"]
-        }
-        firebase = pyrebase.initialize_app(firebase_config)
-        return firebase.auth()
+        try:
+            firebase_config = {
+                "apiKey": st.secrets["firebase"]["api_key"],
+                "authDomain": st.secrets["firebase"]["auth_domain"],
+                "projectId": st.secrets["firebase"]["project_id"],
+                "storageBucket": st.secrets["firebase"]["storage_bucket"],
+                "messagingSenderId": st.secrets["firebase"]["messaging_sender_id"],
+                "appId": st.secrets["firebase"]["app_id"],
+                "measurementId": st.secrets["firebase"]["measurement_id"]
+            }
+            firebase = pyrebase.initialize_app(firebase_config)
+            return firebase.auth()
+        except Exception as e:
+            st.error("Error initializing Firebase.")
+            st.exception(e)
 
     # Signup functionality
     if option == "Signup":
@@ -95,7 +99,8 @@ with st.container():
                 auth.create_user_with_email_and_password(email, password)
                 st.success("Account created! Please log in.")
             except Exception as e:
-                st.error(f"Error: {e}")
+                st.error("Failed to create account.")
+                st.exception(e)
 
     # Login functionality
     if option == "Login":
@@ -107,32 +112,70 @@ with st.container():
                 st.session_state.logged_in = True
                 st.session_state.email = email
             except Exception as e:
-                st.error(f"Invalid credentials or network issue. Error: {e}")
+                st.error("Invalid credentials or network issue.")
+                st.exception(e)
 
     st.markdown("</div>", unsafe_allow_html=True)
+
+# Function to query the Llama model API using Streamlit secrets
+def query_llama_model(query, api_key, model):
+    try:
+        url = "https://api.llama.com/v1/query"  # Replace with actual Llama API endpoint
+
+        headers = {
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json"
+        }
+
+        payload = {
+            "model": model,
+            "prompt": query + " Please provide a reference with your answer.",
+            "max_tokens": 150
+        }
+
+        response = requests.post(url, json=payload, headers=headers, timeout=10)
+
+        if response.status_code == 200:
+            data = response.json()
+            answer = data.get("response", "No response from the model.")
+            reference = data.get("reference", "No reference provided.")
+            return answer, reference
+        else:
+            st.error(f"Llama API Error: {response.status_code}")
+            st.text(response.text)
+            return "API returned an error.", "No reference"
+    
+    except requests.exceptions.Timeout:
+        st.error("The request to the Llama API timed out.")
+        return "Timeout error", "No reference"
+
+    except requests.exceptions.RequestException as e:
+        st.error("Failed to reach the Llama API.")
+        st.exception(e)
+        return "Network error", "No reference"
+
+    except Exception as e:
+        st.error("Unexpected error occurred.")
+        st.exception(e)
+        return "Unexpected error", "No reference"
 
 # Protect access to the Llama model AI interface
 if st.session_state.logged_in:
     st.subheader(f"Welcome, {st.session_state.email}")
     
-    # Create a text input box for user query to the Llama AI model
     user_input = st.text_input("Ask the AI model anything")
 
     if user_input:
-        # Get API details from Streamlit secrets for Llama
         llama_api_key = st.secrets["llama"]["api_key"]
         llama_model = st.secrets["llama"]["model"]
         
-        # Call Llama API (replace with the actual API call)
         model_response, reference = query_llama_model(user_input, llama_api_key, llama_model)
         
-        # Display structured response with references
         st.markdown("<div class='response-box'>", unsafe_allow_html=True)
         st.write(f"**AI Response**: {model_response}")
         st.write(f"**Reference**: {reference}")
         st.markdown("</div>", unsafe_allow_html=True)
     
-    # Button to log out
     if st.button("Logout", key="logout", help="Logout from your account", use_container_width=True):
         st.session_state.logged_in = False
         st.session_state.email = ""
@@ -140,32 +183,3 @@ if st.session_state.logged_in:
 
 else:
     st.info("Please login to access the AI model.")
-
-# Function to query the Llama model API using Streamlit secrets
-def query_llama_model(query, api_key, model):
-    # Example of sending a POST request to the Llama API
-    url = "https://api.llama.com/v1/query"  # Replace with actual Llama API endpoint
-    
-    headers = {
-        "Authorization": f"Bearer {api_key}",
-        "Content-Type": "application/json"
-    }
-    
-    # Payload to send to Llama model
-    payload = {
-        "model": model,
-        "prompt": query + " Please provide a reference with your answer.",
-        "max_tokens": 150
-    }
-    
-    # Sending the request to the API
-    response = requests.post(url, json=payload, headers=headers)
-    
-    if response.status_code == 200:
-        # Assuming the response is in JSON format and contains a "response" field and reference
-        data = response.json()
-        answer = data.get("response", "Sorry, no response from the model.")
-        reference = data.get("reference", "No reference provided.")
-        return answer, reference
-    else:
-        return f"Error: {response.status_code} - {response.text}", "No reference available"
