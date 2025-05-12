@@ -101,11 +101,12 @@ def show_auth_ui():
             tab1, tab2 = st.tabs(["Login", "Sign Up"])
             
             with tab1:
-                with st.form("login_form"):
-                    email = st.text_input("Email", placeholder="your@email.com")
-                    password = st.text_input("Password", type="password")
+                login_form = st.form(key="login_form_unique")
+                with login_form:
+                    email = st.text_input("Email", key="login_email_unique")
+                    password = st.text_input("Password", type="password", key="login_pass_unique")
                     
-                    if st.form_submit_button("Login", use_container_width=True):
+                    if st.form_submit_button("Login", key="login_btn_unique"):
                         if email and password:
                             # Handle login logic
                             st.session_state.logged_in = True
@@ -114,22 +115,23 @@ def show_auth_ui():
                             st.error("Please fill all fields")
             
             with tab2:
-                with st.form("signup_form"):
+                signup_form = st.form(key="signup_form_unique")
+                with signup_form:
                     col1, col2 = st.columns(2)
                     with col1:
-                        first_name = st.text_input("First Name", placeholder="Muhammad")
+                        first_name = st.text_input("First Name", key="signup_fname_unique")
                     with col2:
-                        last_name = st.text_input("Last Name", placeholder="Faizan")
+                        last_name = st.text_input("Last Name", key="signup_lname_unique")
                     
-                    email = st.text_input("Email", placeholder="your@email.com")
+                    email = st.text_input("Email", key="signup_email_unique")
                     
                     col3, col4 = st.columns(2)
                     with col3:
-                        password = st.text_input("Password", type="password")
+                        password = st.text_input("Password", type="password", key="signup_pass_unique")
                     with col4:
-                        confirm_pass = st.text_input("Confirm Password", type="password")
+                        confirm_pass = st.text_input("Confirm Password", type="password", key="signup_cpass_unique")
                     
-                    if st.form_submit_button("Create Account", use_container_width=True):
+                    if st.form_submit_button("Create Account", key="signup_btn_unique"):
                         if not all([first_name, last_name, email, password, confirm_pass]):
                             st.error("Please fill all fields")
                         elif password != confirm_pass:
@@ -171,54 +173,59 @@ def show_main_app():
                 </div>
             """, unsafe_allow_html=True)
         with col2:
-            if st.button("Logout", use_container_width=True):
+            if st.button("Logout", key="logout_btn_unique", use_container_width=True):
                 st.session_state.clear()
                 st.rerun()
     
-    # Query interface
-    with st.container():
+    # Query interface with unique form key
+    query_form = st.form(key="query_form_unique")
+    with query_form:
         st.markdown("<div class='custom-card'>", unsafe_allow_html=True)
         
         prompt = st.text_area(
             "Your research query:",
             placeholder="Ask about any topic with academic sources...",
-            height=150
+            height=150,
+            key="query_input_unique"
         )
         
-        if st.button("Verify Information", type="primary", use_container_width=True):
-            with st.spinner("Analyzing academic sources..."):
-                # Simulate API call
-                response = "Sample verified response would appear here with proper academic citations."
-                sources = [
-                    "[Peer-reviewed study on topic](https://example.com) - Journal Name (2023)",
-                    "DOI:10.1234/example.1234567"
-                ]
-                
-                # Display response
-                st.markdown("""
-                    <div style="margin-top: 1.5rem; padding: 1rem; 
-                              background: #3A3B3C; border-radius: 8px;">
-                        <p style="color: var(--text);">{response}</p>
-                    </div>
-                """.format(response=response), unsafe_allow_html=True)
-                
-                # Display sources
-                if sources:
+        if st.form_submit_button("Verify Information", key="verify_btn_unique"):
+            if not prompt:
+                st.warning("Please enter a question")
+            else:
+                with st.spinner("Analyzing academic sources..."):
+                    # Simulate API call
+                    response = "Sample verified response would appear here with proper academic citations."
+                    sources = [
+                        "[Peer-reviewed study on topic](https://example.com) - Journal Name (2023)",
+                        "DOI:10.1234/example.1234567"
+                    ]
+                    
+                    # Display response
                     st.markdown("""
-                        <div style="margin-top: 1.5rem;">
-                            <p style="color: var(--text-secondary); font-weight: bold;">
-                                Verified Sources:
-                            </p>
-                    """, unsafe_allow_html=True)
+                        <div style="margin-top: 1.5rem; padding: 1rem; 
+                                  background: #3A3B3C; border-radius: 8px;">
+                            <p style="color: var(--text);">{response}</p>
+                        </div>
+                    """.format(response=response), unsafe_allow_html=True)
                     
-                    for source in sources:
-                        st.markdown(f"""
-                            <div class="source-item">
-                                <p style="margin: 0; color: var(--text);">{source}</p>
-                            </div>
+                    # Display sources
+                    if sources:
+                        st.markdown("""
+                            <div style="margin-top: 1.5rem;">
+                                <p style="color: var(--text-secondary); font-weight: bold;">
+                                    Verified Sources:
+                                </p>
                         """, unsafe_allow_html=True)
-                    
-                    st.markdown("</div>", unsafe_allow_html=True)
+                        
+                        for source in sources:
+                            st.markdown(f"""
+                                <div class="source-item">
+                                    <p style="margin: 0; color: var(--text);">{source}</p>
+                                </div>
+                            """, unsafe_allow_html=True)
+                        
+                        st.markdown("</div>", unsafe_allow_html=True)
         
         st.markdown("</div>", unsafe_allow_html=True)
 
