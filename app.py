@@ -273,7 +273,8 @@ def show_main_app():
             if st.button("Logout", use_container_width=True):
                 st.session_state.clear()
                 st.rerun()
-        with st.form(key="query_form"):
+    
+    with st.form(key="query_form"):
         st.markdown("<div class='custom-card'>", unsafe_allow_html=True)
         
         prompt = st.text_area(
@@ -317,11 +318,10 @@ def show_main_app():
                             st.markdown("</div>", unsafe_allow_html=True)
                     else:
                         st.error("Failed to get verified response. Please check:")
-                        st.error("\n".join(sources) if sources else "Unknown error occurred"
+                        st.error("\n".join(sources) if sources else "Unknown error occurred")
         
-        st.markdown("</div>", unsafe_allow_html=True)  
-    
-
+        st.markdown("</div>", unsafe_allow_html=True)
+        
 # ======================
 # 6. APP ROUTING
 # ======================
