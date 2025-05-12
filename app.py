@@ -107,9 +107,8 @@ def handle_login(email, password):
 # 3. LLM INTEGRATION (DEBUGGED VERSION)
 # ======================
 def get_verified_response(prompt):
-    """Production-ready query with academic sources"""
+    """Production-ready query with academic sources using Groq API"""
     try:
-        # Debug: Check if secrets are loaded
         if not hasattr(st, 'secrets') or "llama" not in st.secrets:
             return None, ["Missing LLM API configuration"]
             
@@ -118,8 +117,9 @@ def get_verified_response(prompt):
             "Content-Type": "application/json"
         }
         
+        # Updated for Groq API with available models
         payload = {
-            "model": "llama-3-70b",
+            "model": "llama3-70b-8192",  # Groq's available model
             "messages": [
                 {
                     "role": "system",
@@ -134,24 +134,19 @@ def get_verified_response(prompt):
                 }
             ],
             "temperature": 0.3,
-            "max_tokens": 2000
+            "max_tokens": 2000,
+            "top_p": 0.9
         }
         
-        # Debug: Print the API request details
-        print(f"Making request to: {st.secrets.llama.api_url}")
-        print(f"Headers: {headers}")
-        print(f"Payload: {payload}")
-        
         response = requests.post(
-            st.secrets.llama.api_url,
+            st.secrets.llama.api_url,  # Using your Groq endpoint
             headers=headers,
             json=payload,
             timeout=60
         )
         
-        # Debug: Print the response
-        print(f"Response status: {response.status_code}")
-        print(f"Response content: {response.text}")
+        # Debug: Print response for troubleshooting
+        print(f"API Response: {response.status_code}, {response.text}")
         
         if response.status_code == 200:
             content = response.json()["choices"][0]["message"]["content"]
@@ -165,7 +160,6 @@ def get_verified_response(prompt):
         
     except Exception as e:
         return None, [f"System Error: {str(e)}"]
-
 # ======================
 # 4. AUTHENTICATION UI
 # ======================
