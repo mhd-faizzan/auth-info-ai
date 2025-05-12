@@ -174,11 +174,12 @@ def show_auth_ui():
             tab1, tab2 = st.tabs(["Login", "Sign Up"])
             
             with tab1:
-                with st.form(key="login_form_unique"):
-                    email = st.text_input("Email", key="login_email_unique", placeholder="your@email.com")
-                    password = st.text_input("Password", key="login_pass_unique", type="password")
+                login_form = st.form(key="login_form")  # Changed key
+                with login_form:
+                    email = st.text_input("Email", key="login_email", placeholder="your@email.com")
+                    password = st.text_input("Password", key="login_pass", type="password")
                     
-                    if st.form_submit_button("Login", use_container_width=True):
+                    if login_form.form_submit_button("Login", use_container_width=True):
                         if email and password:
                             success, message, result = handle_login(email, password)
                             if success:
@@ -194,22 +195,23 @@ def show_auth_ui():
                             st.error("Please fill all fields")
             
             with tab2:
-                with st.form(key="signup_form_unique"):
+                signup_form = st.form(key="signup_form")  # Changed key
+                with signup_form:
                     col1, col2 = st.columns(2)
                     with col1:
-                        first_name = st.text_input("First Name", key="signup_fname_unique", placeholder="Muhammad")
+                        first_name = st.text_input("First Name", key="signup_fname", placeholder="Muhammad")
                     with col2:
-                        last_name = st.text_input("Last Name", key="signup_lname_unique", placeholder="Faizan")
+                        last_name = st.text_input("Last Name", key="signup_lname", placeholder="Faizan")
                     
-                    email = st.text_input("Email", key="signup_email_unique", placeholder="your@email.com")
+                    email = st.text_input("Email", key="signup_email", placeholder="your@email.com")
                     
                     col3, col4 = st.columns(2)
                     with col3:
-                        password = st.text_input("Password", key="signup_pass_unique", type="password")
+                        password = st.text_input("Password", key="signup_pass", type="password")
                     with col4:
-                        confirm_pass = st.text_input("Confirm Password", key="signup_cpass_unique", type="password")
+                        confirm_pass = st.text_input("Confirm Password", key="signup_cpass", type="password")
                     
-                    if st.form_submit_button("Create Account", use_container_width=True):
+                    if signup_form.form_submit_button("Create Account", use_container_width=True):
                         if not all([first_name, last_name, email, password, confirm_pass]):
                             st.error("Please fill all fields")
                         elif password != confirm_pass:
@@ -229,7 +231,6 @@ def show_auth_ui():
                                 st.error(message)
             
             st.markdown("</div>", unsafe_allow_html=True)
-
 # ======================
 # 5. MAIN APP UI
 # ======================
