@@ -2,7 +2,6 @@ import streamlit as st
 import requests
 import re
 from datetime import datetime
-#from streamlit_extras.stylable_container import stylable_container
 
 # ======================
 # 1. INITIALIZATION & CONFIG
@@ -10,8 +9,7 @@ from datetime import datetime
 st.set_page_config(
     page_title="FactVerify Pro",
     page_icon="🔍",
-    layout="centered",
-    initial_sidebar_state="collapsed"
+    layout="centered"
 )
 
 # Initialize session state
@@ -84,88 +82,99 @@ def handle_login(email, password):
 # ======================
 def show_auth_ui():
     """Authentication UI with modern styling"""
+    st.markdown("""
+        <style>
+            .auth-container {
+                max-width: 500px;
+                margin: 0 auto;
+                padding: 2rem;
+                border-radius: 12px;
+                background: white;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            }
+            .header-text {
+                text-align: center;
+                margin-bottom: 2rem;
+            }
+            .stTabs [role="tablist"] {
+                gap: 0.5rem;
+            }
+            .stTabs [role="tab"] {
+                padding: 0.5rem 1rem;
+                border-radius: 8px;
+                background: #f8f9fa;
+            }
+            .stTabs [aria-selected="true"] {
+                background: #3b82f6;
+                color: white;
+            }
+        </style>
+    """, unsafe_allow_html=True)
+    
+    st.markdown("""
+        <div class="header-text">
+            <h1 style="color: #2563EB; margin-bottom: 0.5rem;">🔍 FactVerify Pro</h1>
+            <p style="color: #6B7280;">Research-grade answers with verified sources</p>
+        </div>
+    """, unsafe_allow_html=True)
+    
     with st.container():
-        # Header with animation
-        st.markdown("""
-            <div style="text-align: center; margin-bottom: 2rem;">
-                <h1 style="font-size: 2.5rem; background: linear-gradient(90deg, #2563EB, #7C3AED);
-                          -webkit-background-clip: text; color: transparent; margin-bottom: 0.5rem;">
-                    🔍 FactVerify Pro
-                </h1>
-                <p style="color: #6B7280; font-size: 1.1rem;">
-                    Research-grade answers with verified sources
-                </p>
-            </div>
-        """, unsafe_allow_html=True)
+        st.markdown("<div class='auth-container'>", unsafe_allow_html=True)
         
-        # Auth container with glass morphism effect
-        with stylable_container(
-            key="auth_container",
-            css_styles="""
-                {
-                    background: rgba(255, 255, 255, 0.8);
-                    backdrop-filter: blur(10px);
-                    border-radius: 12px;
-                    padding: 2rem;
-                    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-                    border: 1px solid rgba(255, 255, 255, 0.3);
-                    max-width: 500px;
-                    margin: 0 auto;
-                }
-            """
-        ):
-            tab1, tab2 = st.tabs(["Login", "Sign Up"])
-            
-            with tab1:
-                with st.form("login_form"):
-                    email = st.text_input("Email", placeholder="your@email.com")
+        tab1, tab2 = st.tabs(["Login", "Sign Up"])
+        
+        with tab1:
+            with st.form("login_form"):
+                email = st.text_input("Email", placeholder="your@email.com")
+                password = st.text_input("Password", type="password")
+                
+                if st.form_submit_button("Login", use_container_width=True):
+                    if email and password:
+                        success, message, result = handle_login(email, password)
+                        if success:
+                            st.session_state.update({
+                                'logged_in': True,
+                                'email': email,
+                                'id_token': result.get("idToken", "")
+                            })
+                            st.success(message)
+                            st.rerun()
+                        else:
+                            st.error(message)
+                    else:
+                        st.error("Please enter both email and password")
+        
+        with tab2:
+            with st.form("signup_form"):
+                col1, col2 = st.columns(2)
+                with col1:
+                    first_name = st.text_input("First Name", placeholder="Muhammad")
+                with col2:
+                    last_name = st.text_input("Last Name", placeholder="Faizan")
+                
+                email = st.text_input("Email", placeholder="your@email.com")
+                
+                col3, col4 = st.columns(2)
+                with col3:
                     password = st.text_input("Password", type="password")
-                    
-                    if st.form_submit_button("Login", use_container_width=True):
-                        if email and password:
-                            success, message, result = handle_login(email, password)
-                            if success:
-                                st.session_state.update({
-                                    'logged_in': True,
-                                    'email': email,
-                                    'id_token': result.get("idToken", "")
-                                })
-                                st.success(message)
-                                st.rerun()
-                            else:
-                                st.error(message)
+                with col4:
+                    confirm_pass = st.text_input("Confirm Password", type="password")
+                
+                if st.form_submit_button("Create Account", use_container_width=True):
+                    if not all([first_name, last_name, email, password, confirm_pass]):
+                        st.error("Please fill all fields")
+                    elif password != confirm_pass:
+                        st.error("Passwords don't match")
+                    elif len(password) < 6:
+                        st.error("Password must be at least 6 characters")
+                    else:
+                        success, message = handle_signup(first_name, last_name, email, password)
+                        if success:
+                            st.success(message)
                         else:
-                            st.error("Please enter both email and password")
-            
-            with tab2:
-                with st.form("signup_form"):
-                    col1, col2 = st.columns(2)
-                    with col1:
-                        first_name = st.text_input("First Name", placeholder="Muhammad")
-                    with col2:
-                        last_name = st.text_input("Last Name", placeholder="Faizan")
-                    
-                    email = st.text_input("Email", placeholder="your@email.com")
-                    
-                    col3, col4 = st.columns(2)
-                    with col3:
-                        password = st.text_input("Password", type="password")
-                    with col4:
-                        confirm_pass = st.text_input("Confirm Password", type="password")
-                    
-                    if st.form_submit_button("Create Account", use_container_width=True):
-                        if not all([first_name, last_name, email, password, confirm_pass]):
-                            st.error("Please fill all fields")
-                        elif password != confirm_pass:
-                            st.error("Passwords don't match")
-                        elif len(password) < 6:
-                            st.error("Password must be at least 6 characters")
-                        else:
-                            success, message = handle_signup(first_name, last_name, email, password)
-                            if success:
-                                st.success(message)
-                            else:
-                                st.error(message)
+                            st.error(message)
+        
+        st.markdown("</div>", unsafe_allow_html=True)
 
 def show_main_app():
     """Main application interface with professional UI"""
@@ -174,50 +183,32 @@ def show_main_app():
     last_name = st.session_state.get('last_name', '')
     display_name = f"{first_name[0].upper()}. {last_name}" if first_name else st.session_state.email.split('@')[0]
     
-    # Header with user avatar
+    # Header with user info
     col1, col2 = st.columns([4, 1])
     with col1:
         st.markdown(f"""
             <div style="display: flex; align-items: center; gap: 1rem;">
                 <div style="width: 50px; height: 50px; border-radius: 50%; 
-                          background: linear-gradient(135deg, #3B82F6, #8B5CF6);
-                          display: flex; align-items: center; justify-content: center;
-                          color: white; font-weight: bold; font-size: 1.2rem;">
+                          background: #3B82F6; display: flex; align-items: center; 
+                          justify-content: center; color: white; font-weight: bold;">
                     {display_name[0].upper()}
                 </div>
                 <h1 style="margin: 0;">Welcome back, {display_name}!</h1>
             </div>
         """, unsafe_allow_html=True)
     with col2:
-        if st.button("Logout", type="secondary", use_container_width=True):
+        if st.button("Logout", use_container_width=True):
             st.session_state.clear()
             st.rerun()
     
-    # Divider with animation
-    st.markdown("""
-        <div style="height: 1px; background: linear-gradient(90deg, transparent, #E5E7EB, transparent);
-                  margin: 1.5rem 0;"></div>
-    """, unsafe_allow_html=True)
+    st.markdown("---")
     
-    # Query Interface with modern card
-    with stylable_container(
-        key="query_card",
-        css_styles="""
-            {
-                background: white;
-                border-radius: 12px;
-                padding: 1.5rem;
-                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-                border: 1px solid #E5E7EB;
-                margin-bottom: 1.5rem;
-            }
-        """
-    ):
+    # Query Interface
+    with st.container():
         prompt = st.text_area(
             "Enter your research query:",
             placeholder="e.g. 'What are the latest advancements in CRISPR technology with academic sources?'",
-            height=150,
-            label_visibility="collapsed"
+            height=150
         )
         
         if st.button("Get Verified Answer", type="primary", use_container_width=True):
@@ -227,22 +218,23 @@ def show_main_app():
                 with st.spinner("🔍 Verifying with academic databases..."):
                     # Simulate API call
                     st.success("This would show the verified response with sources in production")
-                    st.markdown("""
-                        <div style="margin-top: 1.5rem; padding: 1.5rem; 
-                                  background: #F9FAFB; border-radius: 8px;
-                                  border-left: 4px solid #3B82F6;">
-                            <h4 style="margin-top: 0; color: #3B82F6;">📚 Sample Verified Response</h4>
-                            <p>This is where your verified response with academic sources would appear.</p>
-                            <div style="margin-top: 1rem;">
-                                <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                    <span style="font-size: 0.8rem; background: #EFF6FF; 
-                                               color: #3B82F6; padding: 0.25rem 0.5rem;
-                                               border-radius: 4px;">Source 1</span>
-                                    <span>[CRISPR Technology Review](https://example.com) - Nature Journal (2023)</span>
+                    with st.container():
+                        st.markdown("""
+                            <div style="padding: 1.5rem; background: #F8F9FA; 
+                                      border-radius: 8px; border-left: 4px solid #3B82F6;
+                                      margin-top: 1rem;">
+                                <h4 style="color: #3B82F6; margin-top: 0;">📚 Sample Response</h4>
+                                <p>This is where your verified response would appear.</p>
+                                <div style="margin-top: 1rem;">
+                                    <div style="display: flex; gap: 0.5rem; align-items: center;">
+                                        <span style="font-size: 0.8rem; background: #EFF6FF; 
+                                                  color: #3B82F6; padding: 0.25rem 0.5rem;
+                                                  border-radius: 4px;">Source 1</span>
+                                        <span>[Sample Source Title](https://example.com) - Author (2023)</span>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    """, unsafe_allow_html=True)
+                        """, unsafe_allow_html=True)
 
 # ======================
 # 5. MAIN APP FLOW (COMPLETE IMPLEMENTATION)
