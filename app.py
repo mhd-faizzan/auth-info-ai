@@ -8,8 +8,7 @@ from datetime import datetime
 st.set_page_config(
     page_title="FactVerify Pro",
     page_icon="🔍",
-    layout="centered",
-    initial_sidebar_state="collapsed"
+    layout="centered"
 )
 
 # Modern dark theme CSS
@@ -25,8 +24,8 @@ st.markdown("""
         }
         
         .stApp {
-            background-color: var(--bg) !important;
-            color: var(--text) !important;
+            background-color: var(--bg);
+            color: var(--text);
         }
         
         .custom-card {
@@ -35,26 +34,6 @@ st.markdown("""
             padding: 1.5rem;
             margin-bottom: 1.5rem;
             border: 1px solid #3E4042;
-        }
-        
-        .stTextInput input, .stTextArea textarea {
-            background: #3E4042 !important;
-            color: var(--text) !important;
-            border: none !important;
-            border-radius: 8px !important;
-        }
-        
-        .stButton button {
-            background: var(--primary) !important;
-            color: white !important;
-            border: none !important;
-            border-radius: 8px !important;
-            transition: all 0.2s !important;
-        }
-        
-        .stButton button:hover {
-            opacity: 0.9;
-            transform: translateY(-1px);
         }
         
         .source-item {
@@ -76,6 +55,7 @@ if 'logged_in' not in st.session_state:
         'last_name': "",
         'id_token': ""
     })
+
 
 # ======================
 # 2. AUTHENTICATION UI (MODERN)
