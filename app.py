@@ -172,39 +172,124 @@ def handle_signup(first_name, last_name, email, password):
 # ======================
 # 5. STREAMLIT UI
 # ======================
-st.set_page_config(page_title="AcademicFactCheck", page_icon="🔬")
+def show_auth_ui():
+    """Authentication UI with signup/login tabs"""
+    st.markdown("""
+        <div style="text-align: center; margin-bottom: 2rem;">
+            <h1>🔐 FactVerify Pro</h1>
+            <p>Get answers with verified sources</p>
+        </div>
+    """, unsafe_allow_html=True)
+    
+    with st.container():
+        st.markdown("<div class='auth-container'>", unsafe_allow_html=True)
+        
+        tab1, tab2 = st.tabs(["Login", "Sign Up"])
+        
+        with tab1:
+            email = st.text_input("Email", key="login_email")
+            password = st.text_input("Password", type="password", key="login_pass")
+            if st.button("Login", type="primary", use_container_width=True):
+                if email and password:
+                    success, message, result = handle_login(email, password)
+                    if success:
+                        st.session_state.update({
+                            'logged_in': True,
+                            'email': email,
+                            'id_token': result.get("idToken", "")
+                        })
+                        st.success(message)
+                        st.rerun()
+                    else:
+                        st.error(message)
+                else:
+                    st.error("Please enter both email and password")
+        
+        with tab2:
+            col1, col2 = st.columns(2)
+            with col1:
+                first_name = st.text_input("First Name", key="signup_fname", placeholder="Muhammad")
+            with col2:
+                last_name = st.text_input("Last Name", key="signup_lname", placeholder="Faizan")
+            
+            email = st.text_input("Email", key="signup_email", placeholder="your@email.com")
+            
+            col3, col4 = st.columns(2)
+            with col3:
+                password = st.text_input("Password", type="password", key="signup_pass")
+            with col4:
+                confirm_pass = st.text_input("Confirm Password", type="password", key="signup_cpass")
+            
+            if st.button("Create Account", type="primary", use_container_width=True):
+                if not all([first_name, last_name, email, password, confirm_pass]):
+                    st.error("Please fill all fields")
+                elif password != confirm_pass:
+                    st.error("Passwords don't match")
+                elif len(password) < 6:
+                    st.error("Password must be at least 6 characters")
+                else:
+                    success, message = handle_signup(first_name, last_name, email, password)
+                    if success:
+                        st.success(message)
+                    else:
+                        st.error(message)
+        
+        st.markdown("</div>", unsafe_allow_html=True)
 
-# Custom CSS
-st.markdown("""
-    <style>
-        .auth-container {
-            max-width: 500px;
-            margin: 2rem auto;
-            padding: 2rem;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-        .source-panel {
-            background-color: #f8f9fa;
-            border-left: 4px solid #4e79a7;
-            padding: 1.5rem;
-            margin-top: 1.5rem;
-        }
-        .source-badge {
-            background-color: #4e79a7;
-            color: white;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 0.8rem;
-            margin-right: 8px;
-        }
-        .warning-panel {
-            background-color: #fff3cd;
-            border-left: 4px solid #ffc107;
-            padding: 1rem;
-        }
-    </style>
-""", unsafe_allow_html=True)
+def show_main_app():
+    """Main application interface after login"""
+    # Personalized greeting
+    first_name = st.session_state.get('first_name', '')
+    last_name = st.session_state.get('last_name', '')
+    display_name = f"{first_name[0].upper()}. {last_name}" if first_name else st.session_state.email.split('@')[0]
+    
+    # Header
+    col1, col2 = st.columns([4, 1])
+    with col1:
+        st.markdown(f"# Welcome back, {display_name}!")
+    with col2:
+        if st.button("Logout", type="secondary"):
+            st.session_state.clear()
+            st.rerun()
+    
+    st.markdown("---")
+    
+    # Query Interface
+    prompt = st.text_area(
+        "Enter your research query:",
+        placeholder="e.g. 'What are the latest advancements in CRISPR technology with academic sources?'",
+        height=150
+    )
+    
+    if st.button("Get Verified Answer", type="primary", use_container_width=True):
+        if not prompt:
+            st.warning("Please enter a research question")
+        else:
+            with st.spinner("🔍 Verifying with academic databases..."):
+                start_time = datetime.now()
+                response, sources = get_verified_response(prompt)
+                response_time = (datetime.now() - start_time).total_seconds()
+                
+                if response:
+                    st.markdown("### Research Summary")
+                    st.write(response)
+                    
+                    if sources:
+                        st.markdown("""
+                            <div class="source-panel">
+                                <h4>📚 Academic References</h4>
+                                {}
+                            </div>
+                        """.format("".join(
+                            f'<div><span class="source-badge">Source {i+1}</span>{s}</div><br>'
+                            for i, s in enumerate(sources)
+                        ), unsafe_allow_html=True)
+                    else:
+                        st.warning("No academic sources found - verify claims independently")
+                    
+                    st.caption(f"Verified in {response_time:.1f} seconds | {len(sources)} academic sources")
+                else:
+                    st.error("Failed to retrieve verified information")
 
 # Session state initialization
 if 'logged_in' not in st.session_state:
