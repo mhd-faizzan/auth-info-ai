@@ -261,7 +261,35 @@ def show_main_app():
                 st.session_state.clear()
                 st.rerun()
     
-    # Query interface
+def show_main_app():
+    # Personalized header
+    first_name = st.session_state.get('first_name', '')
+    last_name = st.session_state.get('last_name', '')
+    display_name = f"{first_name[0].upper()}. {last_name}" if first_name else st.session_state.email.split('@')[0]
+    
+    with st.container():
+        col1, col2 = st.columns([4, 1])
+        with col1:
+            st.markdown(f"""
+                <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;">
+                    <div style="width: 48px; height: 48px; border-radius: 50%; 
+                              background: var(--primary); display: flex; 
+                              align-items: center; justify-content: center;
+                              color: white; font-weight: bold; font-size: 1.1rem;">
+                        {display_name[0].upper()}
+                    </div>
+                    <div>
+                        <h1 style="margin: 0; color: var(--text);">Welcome back, {display_name}</h1>
+                        <p style="margin: 0; color: var(--text-secondary);">Ready to verify some facts?</p>
+                    </div>
+                </div>
+            """, unsafe_allow_html=True)
+        with col2:
+            if st.button("Logout", key="logout_btn_unique", use_container_width=True):
+                st.session_state.clear()
+                st.rerun()
+    
+    # Query interface - THIS IS THE SECTION TO REPLACE
     with st.form(key="query_form_unique"):
         st.markdown("<div class='custom-card'>", unsafe_allow_html=True)
         
@@ -272,7 +300,9 @@ def show_main_app():
             key="query_input_unique"
         )
         
-        if st.form_submit_button("Verify Information", key="verify_btn_unique", use_container_width=True):
+        submit_button = st.form_submit_button("Verify Information", key="verify_btn_unique", use_container_width=True)
+        
+        if submit_button:
             if not prompt:
                 st.warning("Please enter a question")
             else:
@@ -321,63 +351,6 @@ def show_main_app():
 
 # ======================
 # 6. APP ROUTING
-# ======================
-if not st.session_state.logged_in:
-    show_auth_ui()
-else:
-    show_main_app()
-
-# ======================
-# 7. INTEGRATE INTO MAIN APP
-# ======================
-# Update the button handler in show_main_app():
-if st.button("Verify Information", type="primary", use_container_width=True):
-    if not prompt:
-        st.warning("Please enter a question")
-    else:
-        with st.spinner("🔍 Verifying with academic databases..."):
-            start_time = datetime.now()
-            response, sources = get_verified_response(prompt)
-            response_time = (datetime.now() - start_time).total_seconds()
-            
-            if response:
-                # Display response
-                st.markdown(f"""
-                    <div style="margin-top: 1.5rem; padding: 1rem; 
-                              background: #3A3B3C; border-radius: 8px;">
-                        <p style="color: var(--text);">{response}</p>
-                    </div>
-                """, unsafe_allow_html=True)
-                
-                # Display sources if available
-                if sources:
-                    st.markdown("""
-                        <div style="margin-top: 1.5rem;">
-                            <p style="color: var(--text-secondary); font-weight: bold;">
-                                📚 Verified Sources:
-                            </p>
-                    """, unsafe_allow_html=True)
-                    
-                    for source in sources:
-                        st.markdown(f"""
-                            <div class="source-item">
-                                <p style="margin: 0; color: var(--text);">{source}</p>
-                            </div>
-                        """, unsafe_allow_html=True)
-                    
-                    st.markdown("</div>", unsafe_allow_html=True)
-                
-                # Show metrics
-                st.markdown(f"""
-                    <div style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 1rem;">
-                        ⏱️ Verified in {response_time:.1f}s • {len(sources)} academic sources
-                    </div>
-                """, unsafe_allow_html=True)
-            else:
-                st.error("Failed to get verified response")
-
-# ======================
-# 8. FINAL APP ROUTING
 # ======================
 if not st.session_state.logged_in:
     show_auth_ui()
