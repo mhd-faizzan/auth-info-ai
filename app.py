@@ -104,11 +104,15 @@ def handle_login(email, password):
         return False, f"Connection error: {str(e)}", None
 
 # ======================
-# 3. LLM INTEGRATION
+# 3. LLM INTEGRATION (DEBUGGED VERSION)
 # ======================
 def get_verified_response(prompt):
     """Production-ready query with academic sources"""
     try:
+        # Debug: Check if secrets are loaded
+        if not hasattr(st, 'secrets') or "llama" not in st.secrets:
+            return None, ["Missing LLM API configuration"]
+            
         headers = {
             "Authorization": f"Bearer {st.secrets.llama.api_key}",
             "Content-Type": "application/json"
@@ -133,6 +137,11 @@ def get_verified_response(prompt):
             "max_tokens": 2000
         }
         
+        # Debug: Print the API request details
+        print(f"Making request to: {st.secrets.llama.api_url}")
+        print(f"Headers: {headers}")
+        print(f"Payload: {payload}")
+        
         response = requests.post(
             st.secrets.llama.api_url,
             headers=headers,
@@ -140,13 +149,20 @@ def get_verified_response(prompt):
             timeout=60
         )
         
+        # Debug: Print the response
+        print(f"Response status: {response.status_code}")
+        print(f"Response content: {response.text}")
+        
         if response.status_code == 200:
             content = response.json()["choices"][0]["message"]["content"]
             if "###SOURCES###" in content:
                 parts = content.split("###SOURCES###")
                 return parts[0].strip(), [s.strip() for s in parts[1].split("\n") if s.strip()]
             return content, []
-        return None, ["API Error: Failed to get response"]
+        
+        error_msg = response.json().get("error", {}).get("message", "Unknown API error")
+        return None, [f"API Error: {error_msg}"]
+        
     except Exception as e:
         return None, [f"System Error: {str(e)}"]
 
@@ -155,7 +171,6 @@ def get_verified_response(prompt):
 # ======================
 def show_auth_ui():
     with st.container():
-        # Header with logo
         st.markdown("""
             <div style="text-align: center; margin-bottom: 2rem;">
                 <h1 style="color: var(--primary); margin-bottom: 0.5rem;">
@@ -167,19 +182,17 @@ def show_auth_ui():
             </div>
         """, unsafe_allow_html=True)
         
-        # Auth card
         with st.container():
             st.markdown("<div class='custom-card'>", unsafe_allow_html=True)
             
             tab1, tab2 = st.tabs(["Login", "Sign Up"])
             
             with tab1:
-                login_form = st.form(key="login_form")  # Changed key
-                with login_form:
-                    email = st.text_input("Email", key="login_email", placeholder="your@email.com")
-                    password = st.text_input("Password", key="login_pass", type="password")
+                with st.form(key="login_form"):
+                    email = st.text_input("Email", placeholder="your@email.com")
+                    password = st.text_input("Password", type="password")
                     
-                    if login_form.form_submit_button("Login", use_container_width=True):
+                    if st.form_submit_button("Login", use_container_width=True):
                         if email and password:
                             success, message, result = handle_login(email, password)
                             if success:
@@ -195,23 +208,22 @@ def show_auth_ui():
                             st.error("Please fill all fields")
             
             with tab2:
-                signup_form = st.form(key="signup_form")  # Changed key
-                with signup_form:
+                with st.form(key="signup_form"):
                     col1, col2 = st.columns(2)
                     with col1:
-                        first_name = st.text_input("First Name", key="signup_fname", placeholder="Muhammad")
+                        first_name = st.text_input("First Name", placeholder="Muhammad")
                     with col2:
-                        last_name = st.text_input("Last Name", key="signup_lname", placeholder="Faizan")
+                        last_name = st.text_input("Last Name", placeholder="Faizan")
                     
-                    email = st.text_input("Email", key="signup_email", placeholder="your@email.com")
+                    email = st.text_input("Email", placeholder="your@email.com")
                     
                     col3, col4 = st.columns(2)
                     with col3:
-                        password = st.text_input("Password", key="signup_pass", type="password")
+                        password = st.text_input("Password", type="password")
                     with col4:
-                        confirm_pass = st.text_input("Confirm Password", key="signup_cpass", type="password")
+                        confirm_pass = st.text_input("Confirm Password", type="password")
                     
-                    if signup_form.form_submit_button("Create Account", use_container_width=True):
+                    if st.form_submit_button("Create Account", use_container_width=True):
                         if not all([first_name, last_name, email, password, confirm_pass]):
                             st.error("Please fill all fields")
                         elif password != confirm_pass:
@@ -231,11 +243,11 @@ def show_auth_ui():
                                 st.error(message)
             
             st.markdown("</div>", unsafe_allow_html=True)
+
 # ======================
-# 5. MAIN APP UI
+# 5. MAIN APP UI (DEBUGGED VERSION)
 # ======================
 def show_main_app():
-    # Personalized header
     first_name = st.session_state.get('first_name', '')
     last_name = st.session_state.get('last_name', '')
     display_name = f"{first_name[0].upper()}. {last_name}" if first_name else st.session_state.email.split('@')[0]
@@ -258,50 +270,19 @@ def show_main_app():
                 </div>
             """, unsafe_allow_html=True)
         with col2:
-            if st.button("Logout", key="logout_btn_unique", use_container_width=True):
+            if st.button("Logout", use_container_width=True):
                 st.session_state.clear()
                 st.rerun()
     
-def show_main_app():
-    # Personalized header
-    first_name = st.session_state.get('first_name', '')
-    last_name = st.session_state.get('last_name', '')
-    display_name = f"{first_name[0].upper()}. {last_name}" if first_name else st.session_state.email.split('@')[0]
-    
-    with st.container():
-        col1, col2 = st.columns([4, 1])
-        with col1:
-            st.markdown(f"""
-                <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;">
-                    <div style="width: 48px; height: 48px; border-radius: 50%; 
-                              background: var(--primary); display: flex; 
-                              align-items: center; justify-content: center;
-                              color: white; font-weight: bold; font-size: 1.1rem;">
-                        {display_name[0].upper()}
-                    </div>
-                    <div>
-                        <h1 style="margin: 0; color: var(--text);">Welcome back, {display_name}</h1>
-                        <p style="margin: 0; color: var(--text-secondary);">Ready to verify some facts?</p>
-                    </div>
-                </div>
-            """, unsafe_allow_html=True)
-        with col2:
-            if st.button("Logout", key="logout_btn_unique", use_container_width=True):
-                st.session_state.clear()
-                st.rerun()
-    
-      # Query interface
     with st.form(key="query_form"):
         st.markdown("<div class='custom-card'>", unsafe_allow_html=True)
         
         prompt = st.text_area(
             "Your research query:",
             placeholder="Ask about any topic with academic sources...",
-            height=150,
-            key="query_input"
+            height=150
         )
         
-        # Create the submit button first
         submitted = st.form_submit_button("Verify Information", use_container_width=True)
         
         if submitted:
@@ -309,12 +290,9 @@ def show_main_app():
                 st.warning("Please enter a question")
             else:
                 with st.spinner("🔍 Verifying with academic databases..."):
-                    start_time = datetime.now()
                     response, sources = get_verified_response(prompt)
-                    response_time = (datetime.now() - start_time).total_seconds()
                     
                     if response:
-                        # Display response
                         st.markdown(f"""
                             <div style="margin-top: 1.5rem; padding: 1rem; 
                                       background: #3A3B3C; border-radius: 8px;">
@@ -322,7 +300,6 @@ def show_main_app():
                             </div>
                         """, unsafe_allow_html=True)
                         
-                        # Display sources if available
                         if sources:
                             st.markdown("""
                                 <div style="margin-top: 1.5rem;">
@@ -339,17 +316,12 @@ def show_main_app():
                                 """, unsafe_allow_html=True)
                             
                             st.markdown("</div>", unsafe_allow_html=True)
-                        
-                        # Show metrics
-                        st.markdown(f"""
-                            <div style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 1rem;">
-                                ⏱️ Verified in {response_time:.1f}s • {len(sources)} academic sources
-                            </div>
-                        """, unsafe_allow_html=True)
                     else:
-                        st.error("Failed to get verified response")
+                        st.error("Failed to get verified response. Please check:")
+                        st.error("\n".join(sources) if sources else st.error("Unknown error occurred")
         
         st.markdown("</div>", unsafe_allow_html=True)
+
 # ======================
 # 6. APP ROUTING
 # ======================
