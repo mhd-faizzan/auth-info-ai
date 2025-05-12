@@ -290,20 +290,21 @@ def show_main_app():
                 st.session_state.clear()
                 st.rerun()
     
-    # Query interface - THIS IS THE SECTION TO REPLACE
-    with st.form(key="query_form_unique"):
+      # Query interface
+    with st.form(key="query_form"):
         st.markdown("<div class='custom-card'>", unsafe_allow_html=True)
         
         prompt = st.text_area(
             "Your research query:",
             placeholder="Ask about any topic with academic sources...",
             height=150,
-            key="query_input_unique"
+            key="query_input"
         )
         
-        submit_button = st.form_submit_button("Verify Information", key="verify_btn_unique", use_container_width=True)
+        # Create the submit button first
+        submitted = st.form_submit_button("Verify Information", use_container_width=True)
         
-        if submit_button:
+        if submitted:
             if not prompt:
                 st.warning("Please enter a question")
             else:
@@ -349,7 +350,6 @@ def show_main_app():
                         st.error("Failed to get verified response")
         
         st.markdown("</div>", unsafe_allow_html=True)
-
 # ======================
 # 6. APP ROUTING
 # ======================
