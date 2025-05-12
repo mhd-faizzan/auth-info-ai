@@ -318,7 +318,7 @@ def show_main_app():
                             st.markdown("</div>", unsafe_allow_html=True)
                     else:
                         st.error("Failed to get verified response. Please check:")
-                        st.error("\n".join(sources) if sources else st.error("Unknown error occurred")
+                        st.error("\n".join(sources) if sources else "Unknown error occurred"
         
         st.markdown("</div>", unsafe_allow_html=True)
 
