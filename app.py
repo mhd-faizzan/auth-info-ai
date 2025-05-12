@@ -243,17 +243,42 @@ if not st.session_state.logged_in:
                     st.error("Please enter both email and password")
         
         with tab2:
+            col1, col2 = st.columns(2)
+            with col1:
+                first_name = st.text_input("First Name", key="signup_fname")
+            with col2:
+                last_name = st.text_input("Last Name", key="signup_lname")
+            
             email = st.text_input("Email", key="signup_email")
             password = st.text_input("Password", type="password", key="signup_pass")
+            confirm_pass = st.text_input("Confirm Password", type="password", key="signup_cpass")
+            
             if st.button("Create Account", type="primary", use_container_width=True):
-                if email and password:
-                    success, message = handle_signup(email, password)
-                    if success:
-                        st.success(message)
-                    else:
-                        st.error(message)
+                if not all([first_name, last_name, email, password, confirm_pass]):
+                    st.error("Please fill all fields")
+                elif password != confirm_pass:
+                    st.error("Passwords don't match")
                 else:
-                    st.error("Please enter both email and password")
+                    # Store name in Firebase (additional user data)
+                    try:
+                        response = requests.post(
+                            FIREBASE_SIGNUP_URL,
+                            json={
+                                "email": email,
+                                "password": password,
+                                "returnSecureToken": True
+                            }
+                        )
+                        if response.status_code == 200:
+                            # Store names in session
+                            st.session_state.first_name = first_name.strip()
+                            st.session_state.last_name = last_name.strip()
+                            st.success("Account created! Please login.")
+                        else:
+                            error = response.json().get("error", {}).get("message", "Unknown error")
+                            st.error(f"Signup failed: {error}")
+                    except Exception as e:
+                        st.error(f"Connection error: {str(e)}")
         
         st.markdown("</div>", unsafe_allow_html=True)
 
@@ -261,18 +286,20 @@ if not st.session_state.logged_in:
 # 7. MAIN APPLICATION
 # ======================
 else:
-    # Header
+    # Personalized greeting
+    first_name = getattr(st.session_state, 'first_name', '')
+    last_name = getattr(st.session_state, 'last_name', '')
+    
+    # Format: "M. Faizan" if name is "Muhammad Faizan"
+    display_name = f"{first_name[0].upper()}. {last_name}" if first_name else st.session_state.email.split('@')[0]
+    
     col1, col2 = st.columns([4, 1])
     with col1:
-        st.markdown(f"# Welcome, Researcher {st.session_state.email.split('@')[0]}")
+        st.markdown(f"# Welcome, {display_name}!")
     with col2:
         if st.button("Logout", type="secondary"):
-            st.session_state.logged_in = False
-            st.session_state.email = ""
-            st.session_state.id_token = ""
+            st.session_state.clear()
             st.rerun()
-    
-    st.markdown("---")
     
     # Query Interface
     prompt = st.text_area(
