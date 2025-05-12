@@ -100,47 +100,45 @@ def show_auth_ui():
             
             tab1, tab2 = st.tabs(["Login", "Sign Up"])
             
-            with tab1:
-                with st.form("login_form"):
-                    email = st.text_input("Email", placeholder="your@email.com")
-                    password = st.text_input("Password", type="password")
-                    
-                    if st.form_submit_button("Login", use_container_width=True):
-                        if email and password:
-                            # Handle login logic
-                            st.session_state.logged_in = True
-                            st.rerun()
-                        else:
-                            st.error("Please fill all fields")
-            
-            with tab2:
-                with st.form("signup_form"):
-                    col1, col2 = st.columns(2)
-                    with col1:
-                        first_name = st.text_input("First Name", placeholder="Muhammad")
-                    with col2:
-                        last_name = st.text_input("Last Name", placeholder="Faizan")
-                    
-                    email = st.text_input("Email", placeholder="your@email.com")
-                    
-                    col3, col4 = st.columns(2)
-                    with col3:
-                        password = st.text_input("Password", type="password")
-                    with col4:
-                        confirm_pass = st.text_input("Confirm Password", type="password")
-                    
-                    if st.form_submit_button("Create Account", use_container_width=True):
-                        if not all([first_name, last_name, email, password, confirm_pass]):
-                            st.error("Please fill all fields")
-                        elif password != confirm_pass:
-                            st.error("Passwords don't match")
-                        else:
-                            # Handle signup logic
-                            st.session_state.update({
-                                'first_name': first_name,
-                                'last_name': last_name
-                            })
-                            st.success("Account created!")
+with tab1:
+    with st.form("login_form"):  # Update form key
+        email = st.text_input("Email", placeholder="your@email.com", key="login_email")  # Add key
+        password = st.text_input("Password", type="password", key="login_password")  # Add key
+
+        if st.form_submit_button("Login", use_container_width=True, key="login_submit"):  # Add key
+            if email and password:
+                st.session_state.logged_in = True
+                st.rerun()
+            else:
+                st.error("Please fill all fields")
+
+with tab2:
+    with st.form("signup_form"):  # Update form key
+        col1, col2 = st.columns(2)
+        with col1:
+            first_name = st.text_input("First Name", placeholder="Muhammad", key="signup_first_name")  # Add key
+        with col2:
+            last_name = st.text_input("Last Name", placeholder="Faizan", key="signup_last_name")  # Add key
+
+        email = st.text_input("Email", placeholder="your@email.com", key="signup_email")  # Add key
+
+        col3, col4 = st.columns(2)
+        with col3:
+            password = st.text_input("Password", type="password", key="signup_password")  # Add key
+        with col4:
+            confirm_pass = st.text_input("Confirm Password", type="password", key="signup_confirm_password")  # Add key
+
+        if st.form_submit_button("Create Account", use_container_width=True, key="signup_submit"):  # Add key
+            if not all([first_name, last_name, email, password, confirm_pass]):
+                st.error("Please fill all fields")
+            elif password != confirm_pass:
+                st.error("Passwords don't match")
+            else:
+                st.session_state.update({
+                    'first_name': first_name,
+                    'last_name': last_name
+                })
+                st.success("Account created!")
             
             st.markdown("</div>", unsafe_allow_html=True)
 
@@ -185,42 +183,46 @@ def show_main_app():
             height=150
         )
         
-        if st.button("Verify Information", type="primary", use_container_width=True):
-            with st.spinner("Analyzing academic sources..."):
-                # Simulate API call
-                response = "Sample verified response would appear here with proper academic citations."
-                sources = [
-                    "[Peer-reviewed study on topic](https://example.com) - Journal Name (2023)",
-                    "DOI:10.1234/example.1234567"
-                ]
-                
-                # Display response
-                st.markdown("""
+if st.button("Verify Information", type="primary", use_container_width=True):
+    if not prompt:
+        st.warning("Please enter a question")
+    else:
+        with st.spinner("🔍 Verifying with academic databases..."):
+            start_time = datetime.now()
+            response, sources = get_verified_response(prompt)  # Use the function for queries
+            response_time = (datetime.now() - start_time).total_seconds()
+            
+            if response:
+                st.markdown(f"""
                     <div style="margin-top: 1.5rem; padding: 1rem; 
                               background: #3A3B3C; border-radius: 8px;">
                         <p style="color: var(--text);">{response}</p>
                     </div>
-                """.format(response=response), unsafe_allow_html=True)
-                
-                # Display sources
+                """, unsafe_allow_html=True)
+
                 if sources:
                     st.markdown("""
                         <div style="margin-top: 1.5rem;">
                             <p style="color: var(--text-secondary); font-weight: bold;">
-                                Verified Sources:
+                                📚 Verified Sources:
                             </p>
                     """, unsafe_allow_html=True)
-                    
                     for source in sources:
                         st.markdown(f"""
                             <div class="source-item">
                                 <p style="margin: 0; color: var(--text);">{source}</p>
                             </div>
                         """, unsafe_allow_html=True)
-                    
                     st.markdown("</div>", unsafe_allow_html=True)
+
+                st.markdown(f"""
+                    <div style="color: var(--text-secondary); font-size: 0.9rem; margin-top: 1rem;">
+                        ⏱️ Verified in {response_time:.1f}s • {len(sources)} academic sources
+                    </div>
+                """, unsafe_allow_html=True)
+            else:
+                st.error("Failed to get verified response")
         
-        st.markdown("</div>", unsafe_allow_html=True)
 
 # ======================
 # 4. APP ROUTING
@@ -236,7 +238,7 @@ def initialize_firebase():
     if not hasattr(st, 'secrets') or "firebase" not in st.secrets:
         st.error("Missing Firebase configuration")
         st.stop()
-    
+
     return {
         "apiKey": st.secrets.firebase.api_key,
         "authDomain": st.secrets.firebase.auth_domain,
@@ -315,12 +317,13 @@ def get_verified_response(prompt):
         
         if response.status_code == 200:
             content = response.json()["choices"][0]["message"]["content"]
-            # Extract sources between ###SOURCES### markers
             if "###SOURCES###" in content:
                 parts = content.split("###SOURCES###")
                 return parts[0].strip(), [s.strip() for s in parts[1].split("\n") if s.strip()]
             return content, []
-        return None, ["API Error: Failed to get response"]
+        else:
+            error = response.json().get("error", {}).get("message", "Unknown error")
+            return None, [f"API Error: {error}"]
     except Exception as e:
         return None, [f"System Error: {str(e)}"]
 
