@@ -14,7 +14,6 @@ st.set_page_config(
 )
 
 # Professional CSS with ChatGPT-like aesthetics
-# Replace your existing CSS with this more compact version:
 st.markdown("""
     <style>
         :root {
@@ -28,94 +27,225 @@ st.markdown("""
             --border: #D9D9E3;
             --success: #10B981;
             --error: #EF4146;
+            --sidebar: #F7F7F8;
         }
         
-        /* Compact containers */
+        html, body, .stApp {
+            background-color: var(--bg) !important;
+            color: var(--text) !important;
+            font-family: 'Segoe UI', 'Helvetica Neue', sans-serif;
+        }
+        
+        /* Main container styling */
         .main-container {
             max-width: 800px;
             margin: 0 auto;
             padding: 0 1rem;
         }
         
-        /* Compact header */
+        /* Header styling */
         .header {
             text-align: center;
-            margin: 1.5rem 0 2rem;
+            margin: 2rem 0 3rem;
+            padding-top: 1rem;
         }
         
-        /* More compact auth card */
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text);
+        }
+        
+        .header p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            margin: 0;
+        }
+        
+        /* Auth card styling */
         .auth-card {
             background: var(--bg);
             border: 1px solid var(--border);
             border-radius: 8px;
-            padding: 1.5rem;
+            padding: 2rem;
             margin: 0 auto;
             width: 100%;
             max-width: 400px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
         }
         
-        /* Compact form elements */
+        .auth-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: var(--text);
+            text-align: center;
+        }
+        
+        /* Input styling */
         .stTextInput input, 
         .stTextInput input:focus,
         .stTextArea textarea, 
         .stTextArea textarea:focus {
-            padding: 0.6rem !important;
-            font-size: 0.9rem !important;
+            background: var(--bg) !important;
+            border: 1px solid var(--border) !important;
+            color: var(--text) !important;
+            padding: 0.75rem !important;
+            border-radius: 6px !important;
+            font-size: 0.95rem !important;
+            box-shadow: none !important;
         }
         
-        /* Compact buttons */
+        .stTextInput input:focus,
+        .stTextArea textarea:focus {
+            border-color: var(--primary) !important;
+            outline: none !important;
+            box-shadow: 0 0 0 2px rgba(16, 163, 127, 0.1) !important;
+        }
+        
+        /* Button styling */
         .stButton button {
-            padding: 0.6rem 1.25rem !important;
-            font-size: 0.9rem !important;
-            margin-top: 0.25rem !important;
+            background: var(--primary) !important;
+            color: white !important;
+            border: none !important;
+            padding: 0.75rem 1.5rem !important;
+            border-radius: 6px !important;
+            font-weight: 500 !important;
+            font-size: 0.95rem !important;
+            width: 100% !important;
+            transition: all 0.2s ease !important;
+            margin-top: 0.5rem !important;
         }
         
-        /* Compact tabs */
-        .stTabs [data-baseweb="tab"] {
-            padding: 0.5rem !important;
-            font-size: 0.9rem !important;
+        .stButton button:hover {
+            background: var(--primary-hover) !important;
+            transform: none !important;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
         }
         
-        /* Compact dashboard */
-        .dashboard-header {
+        /* Tabs styling */
+        .stTabs [data-baseweb="tab-list"] {
+            gap: 0;
+            border-bottom: 1px solid var(--border);
             margin-bottom: 1.5rem;
-            padding-bottom: 0.75rem;
         }
         
-        /* Compact user info */
+        .stTabs [data-baseweb="tab"] {
+            padding: 0.75rem 1rem;
+            margin: 0;
+            border: none;
+            background: transparent !important;
+            color: var(--text-secondary) !important;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            flex: 1;
+            text-align: center;
+        }
+        
+        .stTabs [aria-selected="true"] {
+            background: transparent !important;
+            color: var(--primary) !important;
+            border-bottom: 2px solid var(--primary) !important;
+        }
+        
+        /* Dashboard styling */
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
         .user-avatar {
-            width: 36px;
-            height: 36px;
-            font-size: 0.9rem;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), #6B46C1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1rem;
         }
         
-        /* Compact response cards */
-        .response-card {
-            padding: 1.25rem;
-            margin: 1.25rem 0;
+        .user-text h3 {
+            margin: 0;
+            font-size: 1rem;
+            font-weight: 600;
         }
         
-        /* Compact source items */
-        .source-item {
-            padding: 0.75rem;
-            margin-bottom: 0.5rem;
+        .user-text p {
+            margin: 0;
             font-size: 0.85rem;
+            color: var(--text-secondary);
         }
         
-        /* Compact titles */
-        .auth-title {
-            font-size: 1.1rem;
-            margin-bottom: 1.25rem;
+        /* Query form styling */
+        .query-form {
+            margin-bottom: 2rem;
         }
         
         .query-title {
-            font-size: 1.1rem;
-            margin-bottom: 0.4rem;
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text);
         }
         
         .query-subtitle {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        /* Response styling */
+        .response-card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border: 1px solid var(--border);
+        }
+        
+        .sources-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin: 1.5rem 0 1rem;
+            color: var(--text-secondary);
+        }
+        
+        .source-item {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            font-size: 0.9rem;
+        }
+        
+        /* Error messages */
+        .stAlert {
+            border-radius: 6px !important;
+        }
+        
+        /* Footer styling */
+        .footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding: 1rem 0;
+            color: var(--text-secondary);
             font-size: 0.85rem;
-            margin-bottom: 1.25rem;
+            border-top: 1px solid var(--border);
         }
     </style>
 """, unsafe_allow_html=True)
