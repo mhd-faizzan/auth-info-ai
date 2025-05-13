@@ -359,6 +359,17 @@ if 'logged_in' not in st.session_state:
     })
 
 # ======================
+# 2. LOGOUT FUNCTIONALITY
+# ======================
+def handle_logout():
+    st.session_state.clear()
+    st.rerun()
+
+# Check for logout parameter in URL
+if st.experimental_get_query_params().get('logout'):
+    handle_logout()
+
+# ======================
 # 2. FIREBASE INTEGRATION
 # ======================
 def initialize_firebase():
