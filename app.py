@@ -9,20 +9,23 @@ import random
 st.set_page_config(
     page_title="FactVerify Pro",
     page_icon="🔍",
-    layout="wide",  # Changed to wide layout
+    layout="wide",
     initial_sidebar_state="collapsed"
 )
 
-# Enhanced dark theme CSS
+# Enhanced dark theme CSS with modern professional look
 st.markdown("""
     <style>
         :root {
-            --primary: #1877F2;
+            --primary: #4A6FA5;
+            --primary-hover: #3A5A8C;
             --secondary: #65676B;
-            --bg: #18191A;
-            --card-bg: #242526;
-            --text: #E4E6EB;
-            --text-secondary: #B0B3B8;
+            --bg: #0E1117;
+            --card-bg: #1E293B;
+            --text: #F8FAFC;
+            --text-secondary: #94A3B8;
+            --border: #334155;
+            --success: #10B981;
         }
         
         .stApp {
@@ -32,34 +35,101 @@ st.markdown("""
             margin: 0 auto !important;
         }
         
-        .custom-card {
+        .header-container {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding-top: 1rem;
+        }
+        
+        .auth-container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 2rem 0;
+        }
+        
+        .auth-card {
             background: var(--card-bg);
             border-radius: 12px;
-            padding: 2rem;
-            margin-bottom: 2rem;
-            border: 1px solid #3E4042;
+            padding: 2.5rem;
+            border: 1px solid var(--border);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stTextInput input, .stTextInput input:focus,
+        .stTextArea textarea, .stTextArea textarea:focus {
+            background: #1E293B !important;
+            border: 1px solid var(--border) !important;
+            color: var(--text) !important;
+            padding: 12px !important;
+            border-radius: 8px !important;
+        }
+        
+        .stButton button {
+            background: var(--primary) !important;
+            color: white !important;
+            border: none !important;
+            padding: 12px 24px !important;
+            border-radius: 8px !important;
+            font-weight: 500 !important;
+            transition: all 0.2s ease !important;
+        }
+        
+        .stButton button:hover {
+            background: var(--primary-hover) !important;
+            transform: translateY(-1px);
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stTabs [data-baseweb="tab-list"] {
+            gap: 8px;
+        }
+        
+        .stTabs [data-baseweb="tab"] {
+            padding: 12px 24px;
+            border-radius: 8px;
+            background: transparent;
+            transition: all 0.2s ease;
+        }
+        
+        .stTabs [aria-selected="true"] {
+            background: var(--primary) !important;
+            color: white !important;
         }
         
         .source-item {
             padding: 1rem;
             margin: 0.75rem 0;
-            background: #3A3B3C;
+            background: #334155;
             border-radius: 8px;
             border-left: 4px solid var(--primary);
+            transition: transform 0.2s ease;
         }
         
-        /* Improved text area */
-        .stTextArea textarea {
-            min-height: 200px !important;
-            font-size: 1.1rem !important;
+        .source-item:hover {
+            transform: translateX(4px);
         }
         
-        /* Center the auth form */
-        .auth-container {
-            max-width: 600px;
-            margin: 0 auto;
-            padding-top: 2rem;
+        .user-avatar {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), #6B46C1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.4rem;
+            margin-right: 1rem;
+        }
+        
+        .response-card {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: #334155;
+            border-radius: 10px;
+            border-left: 4px solid var(--primary);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
     </style>
 """, unsafe_allow_html=True)
@@ -204,30 +274,35 @@ def get_verified_response(prompt):
 # 4. AUTHENTICATION UI (UPDATED)
 # ======================
 def show_auth_ui():
+    # Clean header without extra box
+    st.markdown("""
+        <div class="header-container">
+            <h1 style="color: var(--primary); font-size: 2.5rem; margin-bottom: 0.5rem;">
+                🔍 FactVerify Pro
+            </h1>
+            <p style="color: var(--text-secondary); font-size: 1.1rem;">
+                Academic-grade fact verification at your fingertips
+            </p>
+        </div>
+    """, unsafe_allow_html=True)
+    
+    # Centered auth form with cleaner design
     with st.container():
-        # Simplified header without extra box
-        st.markdown("""
-            <div style="text-align: center; margin-bottom: 3rem;">
-                <h1 style="color: var(--primary); font-size: 2.5rem;">
-                    <span style="display: inline-flex; align-items: center;">
-                        🔍 FactVerify Pro
-                    </span>
-                </h1>
-            </div>
-        """, unsafe_allow_html=True)
+        st.markdown("<div class='auth-container'>", unsafe_allow_html=True)
         
-        # Centered auth form
-        with st.container():
+        tab1, tab2 = st.tabs(["Login", "Sign Up"])
+        
+        with tab1:
             with st.container():
-                st.markdown("<div class='custom-card'>", unsafe_allow_html=True)
-                
-                tab1, tab2 = st.tabs(["Login", "Sign Up"])
-                
-                with tab1:
-                    with st.form(key="login_form"):
-                        email = st.text_input("Email", placeholder="your@email.com")
-                        password = st.text_input("Password", type="password")
-                        
+                st.markdown("<div class='auth-card'>", unsafe_allow_html=True)
+                with st.form(key="login_form"):
+                    st.markdown("<h3 style='color: var(--text); margin-bottom: 1.5rem;'>Welcome back</h3>", unsafe_allow_html=True)
+                    
+                    email = st.text_input("Email", placeholder="your@email.com", key="login_email")
+                    password = st.text_input("Password", type="password", key="login_pass")
+                    
+                    col1, col2 = st.columns([3, 1])
+                    with col1:
                         if st.form_submit_button("Login", use_container_width=True):
                             if email and password:
                                 success, message, result = handle_login(email, password)
@@ -244,43 +319,49 @@ def show_auth_ui():
                                     st.error(message)
                             else:
                                 st.error("Please fill all fields")
-                
-                with tab2:
-                    with st.form(key="signup_form"):
-                        col1, col2 = st.columns(2)
-                        with col1:
-                            first_name = st.text_input("First Name", placeholder="Muhammad")
-                        with col2:
-                            last_name = st.text_input("Last Name", placeholder="Faizan")
-                        
-                        email = st.text_input("Email", placeholder="your@email.com")
-                        
-                        col3, col4 = st.columns(2)
-                        with col3:
-                            password = st.text_input("Password", type="password")
-                        with col4:
-                            confirm_pass = st.text_input("Confirm Password", type="password")
-                        
-                        if st.form_submit_button("Create Account", use_container_width=True):
-                            if not all([first_name, last_name, email, password, confirm_pass]):
-                                st.error("Please fill all fields")
-                            elif password != confirm_pass:
-                                st.error("Passwords don't match")
+                    st.markdown("</div>", unsafe_allow_html=True)
+        
+        with tab2:
+            with st.container():
+                st.markdown("<div class='auth-card'>", unsafe_allow_html=True)
+                with st.form(key="signup_form"):
+                    st.markdown("<h3 style='color: var(--text); margin-bottom: 1.5rem;'>Create an account</h3>", unsafe_allow_html=True)
+                    
+                    col1, col2 = st.columns(2)
+                    with col1:
+                        first_name = st.text_input("First Name", placeholder="Muhammad", key="signup_fname")
+                    with col2:
+                        last_name = st.text_input("Last Name", placeholder="Faizan", key="signup_lname")
+                    
+                    email = st.text_input("Email", placeholder="your@email.com", key="signup_email")
+                    
+                    col3, col4 = st.columns(2)
+                    with col3:
+                        password = st.text_input("Password", type="password", key="signup_pass")
+                    with col4:
+                        confirm_pass = st.text_input("Confirm Password", type="password", key="signup_cpass")
+                    
+                    if st.form_submit_button("Create Account", use_container_width=True):
+                        if not all([first_name, last_name, email, password, confirm_pass]):
+                            st.error("Please fill all fields")
+                        elif password != confirm_pass:
+                            st.error("Passwords don't match")
+                        else:
+                            success, message, result = handle_signup(first_name, last_name, email, password)
+                            if success:
+                                st.session_state.update({
+                                    'first_name': first_name,
+                                    'last_name': last_name,
+                                    'logged_in': True,
+                                    'email': email,
+                                    'id_token': result.get("idToken", "")
+                                })
+                                st.rerun()
                             else:
-                                success, message, result = handle_signup(first_name, last_name, email, password)
-                                if success:
-                                    st.session_state.update({
-                                        'first_name': first_name,
-                                        'last_name': last_name,
-                                        'logged_in': True,
-                                        'email': email,
-                                        'id_token': result.get("idToken", "")
-                                    })
-                                    st.rerun()
-                                else:
-                                    st.error(message)
-                
+                                st.error(message)
                 st.markdown("</div>", unsafe_allow_html=True)
+        
+        st.markdown("</div>", unsafe_allow_html=True)
 
 # ======================
 # 5. MAIN APP UI (UPDATED)
@@ -315,10 +396,7 @@ def show_main_app():
         with col1:
             st.markdown(f"""
                 <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem;">
-                    <div style="width: 56px; height: 56px; border-radius: 50%; 
-                              background: var(--primary); display: flex; 
-                              align-items: center; justify-content: center;
-                              color: white; font-weight: bold; font-size: 1.4rem;">
+                    <div class="user-avatar">
                         {display_name[0].upper()}
                     </div>
                     <div>
@@ -334,13 +412,15 @@ def show_main_app():
     
     # Enhanced query form
     with st.form(key="query_form"):
-        st.markdown("<div class='custom-card'>", unsafe_allow_html=True)
+        st.markdown("<h2 style='color: var(--text); margin-bottom: 1rem;'>Research Query</h2>", unsafe_allow_html=True)
+        st.markdown("<p style='color: var(--text-secondary); margin-bottom: 1.5rem;'>Enter your question or statement to verify with academic sources</p>", unsafe_allow_html=True)
         
         prompt = st.text_area(
             "Your research query:",
-            placeholder="Ask about any topic with academic sources...",
-            height=250,  # Increased height
-            key="query_input"
+            placeholder="Example: 'What is the current scientific consensus on climate change?'",
+            height=200,
+            key="query_input",
+            label_visibility="collapsed"
         )
         
         submitted = st.form_submit_button("Verify Information", 
@@ -356,9 +436,7 @@ def show_main_app():
                     
                     if response:
                         st.markdown(f"""
-                            <div style="margin-top: 2rem; padding: 1.5rem; 
-                                      background: #3A3B3C; border-radius: 10px;
-                                      border-left: 4px solid var(--primary);">
+                            <div class="response-card">
                                 <p style="color: var(--text); font-size: 1.1rem; line-height: 1.6;">{response}</p>
                             </div>
                         """, unsafe_allow_html=True)
@@ -382,8 +460,6 @@ def show_main_app():
                     else:
                         st.error("Failed to get verified response. Please check:")
                         st.error("\n".join(sources) if sources else "Unknown error occurred")
-        
-        st.markdown("</div>", unsafe_allow_html=True)
 
 # ======================
 # 6. APP ROUTING
