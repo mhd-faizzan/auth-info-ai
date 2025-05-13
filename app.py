@@ -329,9 +329,9 @@ def show_auth_ui():
                     
                     col1, col2 = st.columns(2)
                     with col1:
-                        first_name = st.text_input("First Name", placeholder="Muhammad", key="signup_fname")
+                        first_name = st.text_input("First Name", placeholder="Given Name", key="signup_fname")
                     with col2:
-                        last_name = st.text_input("Last Name", placeholder="Faizan", key="signup_lname")
+                        last_name = st.text_input("Last Name", placeholder="Family Name", key="signup_lname")
                     
                     email = st.text_input("Email", placeholder="your@email.com", key="signup_email")
                     
