@@ -9,11 +9,11 @@ import random
 st.set_page_config(
     page_title="FactVerify Pro",
     page_icon="🔍",
-    layout="centered",
+    layout="wide",  # Changed to wide layout
     initial_sidebar_state="collapsed"
 )
 
-# Modern dark theme CSS
+# Enhanced dark theme CSS
 st.markdown("""
     <style>
         :root {
@@ -28,22 +28,38 @@ st.markdown("""
         .stApp {
             background-color: var(--bg) !important;
             color: var(--text) !important;
+            max-width: 1200px !important;
+            margin: 0 auto !important;
         }
         
         .custom-card {
             background: var(--card-bg);
             border-radius: 12px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
             border: 1px solid #3E4042;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
         
         .source-item {
-            padding: 0.75rem;
-            margin: 0.5rem 0;
+            padding: 1rem;
+            margin: 0.75rem 0;
             background: #3A3B3C;
             border-radius: 8px;
-            border-left: 3px solid var(--primary);
+            border-left: 4px solid var(--primary);
+        }
+        
+        /* Improved text area */
+        .stTextArea textarea {
+            min-height: 200px !important;
+            font-size: 1.1rem !important;
+        }
+        
+        /* Center the auth form */
+        .auth-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding-top: 2rem;
         }
     </style>
 """, unsafe_allow_html=True)
@@ -189,79 +205,82 @@ def get_verified_response(prompt):
 # ======================
 def show_auth_ui():
     with st.container():
+        # Simplified header without extra box
         st.markdown("""
-            <div style="text-align: center; margin-bottom: 2rem;">
-                <h1 style="color: var(--primary); margin-bottom: 0.5rem;">
+            <div style="text-align: center; margin-bottom: 3rem;">
+                <h1 style="color: var(--primary); font-size: 2.5rem;">
                     <span style="display: inline-flex; align-items: center;">
-                        🔍 FactVerify
+                        🔍 FactVerify Pro
                     </span>
                 </h1>
             </div>
         """, unsafe_allow_html=True)
         
+        # Centered auth form
         with st.container():
-            st.markdown("<div class='custom-card'>", unsafe_allow_html=True)
-            
-            tab1, tab2 = st.tabs(["Login", "Sign Up"])
-            
-            with tab1:
-                with st.form(key="login_form"):
-                    email = st.text_input("Email", placeholder="your@email.com")
-                    password = st.text_input("Password", type="password")
-                    
-                    if st.form_submit_button("Login", use_container_width=True):
-                        if email and password:
-                            success, message, result = handle_login(email, password)
-                            if success:
-                                st.session_state.update({
-                                    'logged_in': True,
-                                    'email': email,
-                                    'id_token': result.get("idToken", ""),
-                                    'first_name': result.get("first_name", ""),
-                                    'last_name': result.get("last_name", "")
-                                })
-                                st.rerun()
-                            else:
-                                st.error(message)
-                        else:
-                            st.error("Please fill all fields")
-            
-            with tab2:
-                with st.form(key="signup_form"):
-                    col1, col2 = st.columns(2)
-                    with col1:
-                        first_name = st.text_input("First Name", placeholder="Muhammad")
-                    with col2:
-                        last_name = st.text_input("Last Name", placeholder="Faizan")
-                    
-                    email = st.text_input("Email", placeholder="your@email.com")
-                    
-                    col3, col4 = st.columns(2)
-                    with col3:
+            with st.container():
+                st.markdown("<div class='custom-card'>", unsafe_allow_html=True)
+                
+                tab1, tab2 = st.tabs(["Login", "Sign Up"])
+                
+                with tab1:
+                    with st.form(key="login_form"):
+                        email = st.text_input("Email", placeholder="your@email.com")
                         password = st.text_input("Password", type="password")
-                    with col4:
-                        confirm_pass = st.text_input("Confirm Password", type="password")
-                    
-                    if st.form_submit_button("Create Account", use_container_width=True):
-                        if not all([first_name, last_name, email, password, confirm_pass]):
-                            st.error("Please fill all fields")
-                        elif password != confirm_pass:
-                            st.error("Passwords don't match")
-                        else:
-                            success, message, result = handle_signup(first_name, last_name, email, password)
-                            if success:
-                                st.session_state.update({
-                                    'first_name': first_name,
-                                    'last_name': last_name,
-                                    'logged_in': True,
-                                    'email': email,
-                                    'id_token': result.get("idToken", "")
-                                })
-                                st.rerun()
+                        
+                        if st.form_submit_button("Login", use_container_width=True):
+                            if email and password:
+                                success, message, result = handle_login(email, password)
+                                if success:
+                                    st.session_state.update({
+                                        'logged_in': True,
+                                        'email': email,
+                                        'id_token': result.get("idToken", ""),
+                                        'first_name': result.get("first_name", ""),
+                                        'last_name': result.get("last_name", "")
+                                    })
+                                    st.rerun()
+                                else:
+                                    st.error(message)
                             else:
-                                st.error(message)
-            
-            st.markdown("</div>", unsafe_allow_html=True)
+                                st.error("Please fill all fields")
+                
+                with tab2:
+                    with st.form(key="signup_form"):
+                        col1, col2 = st.columns(2)
+                        with col1:
+                            first_name = st.text_input("First Name", placeholder="Muhammad")
+                        with col2:
+                            last_name = st.text_input("Last Name", placeholder="Faizan")
+                        
+                        email = st.text_input("Email", placeholder="your@email.com")
+                        
+                        col3, col4 = st.columns(2)
+                        with col3:
+                            password = st.text_input("Password", type="password")
+                        with col4:
+                            confirm_pass = st.text_input("Confirm Password", type="password")
+                        
+                        if st.form_submit_button("Create Account", use_container_width=True):
+                            if not all([first_name, last_name, email, password, confirm_pass]):
+                                st.error("Please fill all fields")
+                            elif password != confirm_pass:
+                                st.error("Passwords don't match")
+                            else:
+                                success, message, result = handle_signup(first_name, last_name, email, password)
+                                if success:
+                                    st.session_state.update({
+                                        'first_name': first_name,
+                                        'last_name': last_name,
+                                        'logged_in': True,
+                                        'email': email,
+                                        'id_token': result.get("idToken", "")
+                                    })
+                                    st.rerun()
+                                else:
+                                    st.error(message)
+                
+                st.markdown("</div>", unsafe_allow_html=True)
 
 # ======================
 # 5. MAIN APP UI (UPDATED)
@@ -292,38 +311,41 @@ def show_main_app():
     
     # Header with greeting
     with st.container():
-        col1, col2 = st.columns([4, 1])
+        col1, col2 = st.columns([5, 1])
         with col1:
             st.markdown(f"""
-                <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;">
-                    <div style="width: 48px; height: 48px; border-radius: 50%; 
+                <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem;">
+                    <div style="width: 56px; height: 56px; border-radius: 50%; 
                               background: var(--primary); display: flex; 
                               align-items: center; justify-content: center;
-                              color: white; font-weight: bold; font-size: 1.1rem;">
+                              color: white; font-weight: bold; font-size: 1.4rem;">
                         {display_name[0].upper()}
                     </div>
                     <div>
-                        <h1 style="margin: 0; color: var(--text);">{greeting}, {display_name}</h1>
-                        <p style="margin: 0; color: var(--text-secondary);">{random_message}</p>
+                        <h1 style="margin: 0; color: var(--text); font-size: 1.8rem;">{greeting}, {display_name}</h1>
+                        <p style="margin: 0; color: var(--text-secondary); font-size: 1.1rem;">{random_message}</p>
                     </div>
                 </div>
             """, unsafe_allow_html=True)
         with col2:
-            if st.button("Logout", use_container_width=True):
+            if st.button("Logout", use_container_width=True, key="logout_btn"):
                 st.session_state.clear()
                 st.rerun()
     
-    # Query form
+    # Enhanced query form
     with st.form(key="query_form"):
         st.markdown("<div class='custom-card'>", unsafe_allow_html=True)
         
         prompt = st.text_area(
             "Your research query:",
             placeholder="Ask about any topic with academic sources...",
-            height=150
+            height=250,  # Increased height
+            key="query_input"
         )
         
-        submitted = st.form_submit_button("Verify Information", use_container_width=True)
+        submitted = st.form_submit_button("Verify Information", 
+                                        use_container_width=True,
+                                        type="primary")
         
         if submitted:
             if not prompt:
@@ -334,24 +356,25 @@ def show_main_app():
                     
                     if response:
                         st.markdown(f"""
-                            <div style="margin-top: 1.5rem; padding: 1rem; 
-                                      background: #3A3B3C; border-radius: 8px;">
-                                <p style="color: var(--text);">{response}</p>
+                            <div style="margin-top: 2rem; padding: 1.5rem; 
+                                      background: #3A3B3C; border-radius: 10px;
+                                      border-left: 4px solid var(--primary);">
+                                <p style="color: var(--text); font-size: 1.1rem; line-height: 1.6;">{response}</p>
                             </div>
                         """, unsafe_allow_html=True)
                         
                         if sources:
                             st.markdown("""
-                                <div style="margin-top: 1.5rem;">
-                                    <p style="color: var(--text-secondary); font-weight: bold;">
+                                <div style="margin-top: 2rem;">
+                                    <h3 style="color: var(--text-secondary); margin-bottom: 1rem;">
                                         📚 Verified Sources:
-                                    </p>
+                                    </h3>
                             """, unsafe_allow_html=True)
                             
                             for source in sources:
                                 st.markdown(f"""
                                     <div class="source-item">
-                                        <p style="margin: 0; color: var(--text);">{source}</p>
+                                        <p style="margin: 0; color: var(--text); font-size: 1rem;">{source}</p>
                                     </div>
                                 """, unsafe_allow_html=True)
                             
