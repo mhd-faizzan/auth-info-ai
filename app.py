@@ -9,341 +9,127 @@ import random
 st.set_page_config(
     page_title="FactVerify Pro",
     page_icon="🔍",
-    layout="centered",
+    layout="wide",
     initial_sidebar_state="collapsed"
 )
 
-# Professional Dark Theme CSS
+# Enhanced dark theme CSS with modern professional look
 st.markdown("""
     <style>
-        /* ====== WhatsApp Dark Theme Variables ====== */
         :root {
-            --primary: #00A884;  /* WhatsApp green */
-            --primary-hover: #008F74;
-            --primary-light: rgba(0, 168, 132, 0.2);
-            --secondary: #8696A0;
-            --bg: #111B21;       /* WhatsApp dark bg */
-            --card-bg: #202C33;  /* Slightly lighter than bg */
-            --text: #E9EDEF;     /* WhatsApp light text */
-            --text-secondary: #AEBAC1;
-            --border: #2A3942;    /* WhatsApp border color */
-            --border-dark: #222E35;
-            --success: #00A884;
-            --error: #F15C6D;
-            --warning: #FFB347;
-            --radius-sm: 4px;
-            --radius-md: 6px;
-            --radius-lg: 8px;
-            --shadow-sm: 0 1px 2px rgba(0,0,0,0.1);
-            --shadow-md: 0 2px 4px rgba(0,0,0,0.2);
-            --transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+            --primary: #4A6FA5;
+            --primary-hover: #3A5A8C;
+            --secondary: #65676B;
+            --bg: #0E1117;
+            --card-bg: #1E293B;
+            --text: #F8FAFC;
+            --text-secondary: #94A3B8;
+            --border: #334155;
+            --success: #10B981;
         }
-
-        /* ====== Logout Button Fix ====== */
-        .logout-btn {
-            background: transparent !important;
-            border: 1px solid var(--border) !important;
-            border-radius: var(--radius-md) !important;
-            padding: 0.5rem 1rem !important;
-            font-size: 0.9rem !important;
+        
+        .stApp {
+            background-color: var(--bg) !important;
             color: var(--text) !important;
-            cursor: pointer !important;
-            transition: var(--transition) !important;
+            max-width: 1200px !important;
+            margin: 0 auto !important;
         }
-
-        .logout-btn:hover {
-            background: var(--card-bg) !important;
-        }
-
-        /* ====== Layout Structure ====== */
-        .main-container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 0 16px;
-        }
-
-        /* ====== Header Styles ====== */
-        .header {
+        
+        .header-container {
             text-align: center;
-            margin: 24px 0 32px;
+            margin-bottom: 3rem;
+            padding-top: 1rem;
         }
-
-        .header h1 {
-            font-size: 28px;
-            font-weight: 600;
-            margin: 0 0 4px;
-            color: var(--text);
-            letter-spacing: -0.01em;
+        
+        .auth-container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 2rem 0;
         }
-
-        .header p {
-            color: var(--text-secondary);
-            font-size: 15px;
-            margin: 0;
-            font-weight: 400;
-        }
-
-        /* ====== Card Components ====== */
-        .card {
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-lg);
-            box-shadow: var(--shadow-sm);
-            transition: var(--transition);
-        }
-
-        .card:hover {
-            box-shadow: var(--shadow-md);
-        }
-
+        
         .auth-card {
-            padding: 24px;
-            margin: 0 auto;
-            width: 100%;
-            max-width: 400px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 2.5rem;
+            border: 1px solid var(--border);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
         }
-
-        /* ====== Form Elements ====== */
-        .form-group {
-            margin-bottom: 16px;
-        }
-
-        .form-label {
-            display: block;
-            margin-bottom: 6px;
-            font-size: 13px;
-            font-weight: 500;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.02em;
-        }
-
-        .stTextInput input, 
-        .stTextInput input:focus,
-        .stTextArea textarea, 
-        .stTextArea textarea:focus {
-            width: 100%;
-            padding: 10px 12px !important;
-            font-size: 14px !important;
-            line-height: 1.5;
+        
+        .stTextInput input, .stTextInput input:focus,
+        .stTextArea textarea, .stTextArea textarea:focus {
+            background: #1E293B !important;
+            border: 1px solid var(--border) !important;
             color: var(--text) !important;
-            background-color: var(--card-bg) !important;
-            border: 1px solid var(--border-dark) !important;
-            border-radius: var(--radius-md) !important;
-            transition: var(--transition) !important;
+            padding: 12px !important;
+            border-radius: 8px !important;
         }
-
-        .stTextInput input:focus,
-        .stTextArea textarea:focus {
-            border-color: var(--primary) !important;
-            outline: none !important;
-            box-shadow: 0 0 0 3px var(--primary-light) !important;
-        }
-
-        /* ====== Buttons ====== */
+        
         .stButton button {
-            display: inline-flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            padding: 10px 16px !important;
-            font-size: 14px !important;
-            font-weight: 500 !important;
-            line-height: 1.5 !important;
+            background: var(--primary) !important;
             color: white !important;
-            background-color: var(--primary) !important;
             border: none !important;
-            border-radius: var(--radius-md) !important;
-            cursor: pointer !important;
-            transition: var(--transition) !important;
-            width: 100% !important;
-            margin-top: 8px !important;
-        }
-
-        .stButton button:hover {
-            background-color: var(--primary-hover) !important;
-            transform: translateY(-1px);
-        }
-
-        .stButton button:active {
-            transform: translateY(0);
-        }
-
-        /* ====== Tabs ====== */
-        .stTabs [data-baseweb="tab-list"] {
-            gap: 0;
-            border-bottom: 1px solid var(--border);
-            margin-bottom: 20px;
-        }
-
-        .stTabs [data-baseweb="tab"] {
-            padding: 10px 16px !important;
-            margin: 0 !important;
-            font-size: 14px !important;
+            padding: 12px 24px !important;
+            border-radius: 8px !important;
             font-weight: 500 !important;
-            color: var(--text-secondary) !important;
-            background: transparent !important;
-            border: none !important;
-            flex: 1;
-            text-align: center;
-            transition: var(--transition) !important;
+            transition: all 0.2s ease !important;
         }
-
+        
+        .stButton button:hover {
+            background: var(--primary-hover) !important;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stTabs [data-baseweb="tab-list"] {
+            gap: 8px;
+        }
+        
+        .stTabs [data-baseweb="tab"] {
+            padding: 12px 24px;
+            border-radius: 8px;
+            background: transparent;
+            transition: all 0.2s ease;
+        }
+        
         .stTabs [aria-selected="true"] {
-            color: var(--primary) !important;
-            background: transparent !important;
-            box-shadow: inset 0 -2px 0 0 var(--primary) !important;
+            background: var(--primary) !important;
+            color: white !important;
         }
-
-        /* ====== Dashboard Components ====== */
-        .dashboard-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-            padding-bottom: 16px;
-            border-bottom: 1px solid var(--border);
+        
+        .source-item {
+            padding: 1rem;
+            margin: 0.75rem 0;
+            background: #334155;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+            transition: transform 0.2s ease;
         }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
+        
+        .source-item:hover {
+            transform: translateX(4px);
         }
-
+        
         .user-avatar {
-            width: 36px;
-            height: 36px;
+            width: 56px;
+            height: 56px;
             border-radius: 50%;
             background: linear-gradient(135deg, var(--primary), #6B46C1);
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-weight: 600;
-            font-size: 14px;
+            font-weight: bold;
+            font-size: 1.4rem;
+            margin-right: 1rem;
         }
-
-        .user-text h3 {
-            margin: 0;
-            font-size: 15px;
-            font-weight: 600;
-            color: var(--text);
-        }
-
-        .user-text p {
-            margin: 0;
-            font-size: 13px;
-            color: var(--text-secondary);
-        }
-
-        /* ====== Query Form ====== */
-        .query-form {
-            margin-bottom: 24px;
-        }
-
-        .query-title {
-            font-size: 16px;
-            font-weight: 600;
-            margin: 0 0 8px;
-            color: var(--text);
-        }
-
-        .query-subtitle {
-            font-size: 14px;
-            color: var(--text-secondary);
-            margin: 0 0 16px;
-        }
-
-        /* ====== Response Cards ====== */
+        
         .response-card {
-            padding: 18px 20px;
-            margin: 20px 0;
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-lg);
-        }
-
-        .response-content {
-            font-size: 15px;
-            line-height: 1.6;
-            color: var(--text);
-        }
-
-        /* ====== Source List ====== */
-        .sources-title {
-            font-size: 14px;
-            font-weight: 600;
-            margin: 24px 0 12px;
-            color: var(--text-secondary);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .source-item {
-            padding: 12px 14px;
-            margin-bottom: 10px;
-            background: var(--bg);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-md);
-            font-size: 14px;
-            transition: var(--transition);
-        }
-
-        .source-item:hover {
-            border-color: var(--primary);
-        }
-
-        /* ====== Utility Classes ====== */
-        .text-center {
-            text-align: center;
-        }
-
-        .mt-1 { margin-top: 4px; }
-        .mt-2 { margin-top: 8px; }
-        .mt-3 { margin-top: 12px; }
-        .mt-4 { margin-top: 16px; }
-        .mt-5 { margin-top: 20px; }
-
-        .mb-1 { margin-bottom: 4px; }
-        .mb-2 { margin-bottom: 8px; }
-        .mb-3 { margin-bottom: 12px; }
-        .mb-4 { margin-bottom: 16px; }
-        .mb-5 { margin-bottom: 20px; }
-
-        /* ====== Footer ====== */
-        .footer {
-            text-align: center;
-            margin-top: 40px;
-            padding: 20px 0;
-            color: var(--text-secondary);
-            font-size: 13px;
-            border-top: 1px solid var(--border);
-        }
-
-        /* ====== Responsive Adjustments ====== */
-        @media (max-width: 640px) {
-            .main-container {
-                padding: 0 12px;
-            }
-            
-            .header {
-                margin: 16px 0 24px;
-            }
-            
-            .header h1 {
-                font-size: 24px;
-            }
-            
-            .auth-card {
-                padding: 20px;
-            }
-            
-            .dashboard-header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 12px;
-            }
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: #334155;
+            border-radius: 10px;
+            border-left: 4px solid var(--primary);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
     </style>
 """, unsafe_allow_html=True)
@@ -359,18 +145,7 @@ if 'logged_in' not in st.session_state:
     })
 
 # ======================
-# 2. LOGOUT FUNCTIONALITY
-# ======================
-def handle_logout():
-    st.session_state.clear()
-    st.rerun()
-
-# Check for logout parameter in URL
-if st.experimental_get_query_params().get('logout'):
-    handle_logout()
-
-# ======================
-# 2. FIREBASE INTEGRATION
+# 2. FIREBASE INTEGRATION (UPDATED)
 # ======================
 def initialize_firebase():
     if not hasattr(st, 'secrets') or "firebase" not in st.secrets:
@@ -496,183 +271,195 @@ def get_verified_response(prompt):
         return None, [f"System Error: {str(e)}"]
 
 # ======================
-# 4. AUTHENTICATION UI
+# 4. AUTHENTICATION UI (UPDATED)
 # ======================
 def show_auth_ui():
+    # Clean header without extra box
     st.markdown("""
-        <div class="main-container">
-            <div class="header">
-                <h1>FactVerify Pro</h1>
-                <p>Academic-grade fact verification powered by AI</p>
-            </div>
+        <div class="header-container">
+            <h1 style="color: var(--primary); font-size: 2.5rem; margin-bottom: 0.5rem;">
+                🔍 FactVerify Pro
+            </h1>
+            <p style="color: var(--text-secondary); font-size: 1.1rem;">
+                Academic-grade fact verification at your fingertips
+            </p>
+        </div>
     """, unsafe_allow_html=True)
     
+    # Centered auth form with cleaner design
     with st.container():
-        st.markdown("<div class='auth-card card'>", unsafe_allow_html=True)
+        st.markdown("<div class='auth-container'>", unsafe_allow_html=True)
         
         tab1, tab2 = st.tabs(["Login", "Sign Up"])
         
         with tab1:
-            with st.form(key="login_form"):
-                st.markdown("<div class='auth-title'>Welcome back</div>", unsafe_allow_html=True)
-                
-                email = st.text_input("Email", placeholder="your@email.com", key="login_email")
-                password = st.text_input("Password", type="password", key="login_pass")
-                
-                if st.form_submit_button("Continue", use_container_width=True):
-                    if email and password:
-                        success, message, result = handle_login(email, password)
-                        if success:
-                            st.session_state.update({
-                                'logged_in': True,
-                                'email': email,
-                                'id_token': result.get("idToken", ""),
-                                'first_name': result.get("first_name", ""),
-                                'last_name': result.get("last_name", "")
-                            })
-                            st.rerun()
-                        else:
-                            st.error(message)
-                    else:
-                        st.error("Please fill all fields")
+            with st.container():
+                st.markdown("<div class='auth-card'>", unsafe_allow_html=True)
+                with st.form(key="login_form"):
+                    st.markdown("<h3 style='color: var(--text); margin-bottom: 1.5rem;'>Welcome back</h3>", unsafe_allow_html=True)
+                    
+                    email = st.text_input("Email", placeholder="your@email.com", key="login_email")
+                    password = st.text_input("Password", type="password", key="login_pass")
+                    
+                    col1, col2 = st.columns([3, 1])
+                    with col1:
+                        if st.form_submit_button("Login", use_container_width=True):
+                            if email and password:
+                                success, message, result = handle_login(email, password)
+                                if success:
+                                    st.session_state.update({
+                                        'logged_in': True,
+                                        'email': email,
+                                        'id_token': result.get("idToken", ""),
+                                        'first_name': result.get("first_name", ""),
+                                        'last_name': result.get("last_name", "")
+                                    })
+                                    st.rerun()
+                                else:
+                                    st.error(message)
+                            else:
+                                st.error("Please fill all fields")
+                    st.markdown("</div>", unsafe_allow_html=True)
         
         with tab2:
-            with st.form(key="signup_form"):
-                st.markdown("<div class='auth-title'>Create your account</div>", unsafe_allow_html=True)
-                
-                col1, col2 = st.columns(2)
-                with col1:
-                    first_name = st.text_input("First Name", placeholder="Muhammad", key="signup_fname")
-                with col2:
-                    last_name = st.text_input("Last Name", placeholder="Faizan", key="signup_lname")
-                
-                email = st.text_input("Email", placeholder="your@email.com", key="signup_email")
-                
-                col3, col4 = st.columns(2)
-                with col3:
-                    password = st.text_input("Password", type="password", key="signup_pass")
-                with col4:
-                    confirm_pass = st.text_input("Confirm Password", type="password", key="signup_cpass")
-                
-                if st.form_submit_button("Create Account", use_container_width=True):
-                    if not all([first_name, last_name, email, password, confirm_pass]):
-                        st.error("Please fill all fields")
-                    elif password != confirm_pass:
-                        st.error("Passwords don't match")
-                    else:
-                        success, message, result = handle_signup(first_name, last_name, email, password)
-                        if success:
-                            st.session_state.update({
-                                'first_name': first_name,
-                                'last_name': last_name,
-                                'logged_in': True,
-                                'email': email,
-                                'id_token': result.get("idToken", "")
-                            })
-                            st.rerun()
+            with st.container():
+                st.markdown("<div class='auth-card'>", unsafe_allow_html=True)
+                with st.form(key="signup_form"):
+                    st.markdown("<h3 style='color: var(--text); margin-bottom: 1.5rem;'>Create an account</h3>", unsafe_allow_html=True)
+                    
+                    col1, col2 = st.columns(2)
+                    with col1:
+                        first_name = st.text_input("First Name", placeholder="Muhammad", key="signup_fname")
+                    with col2:
+                        last_name = st.text_input("Last Name", placeholder="Faizan", key="signup_lname")
+                    
+                    email = st.text_input("Email", placeholder="your@email.com", key="signup_email")
+                    
+                    col3, col4 = st.columns(2)
+                    with col3:
+                        password = st.text_input("Password", type="password", key="signup_pass")
+                    with col4:
+                        confirm_pass = st.text_input("Confirm Password", type="password", key="signup_cpass")
+                    
+                    if st.form_submit_button("Create Account", use_container_width=True):
+                        if not all([first_name, last_name, email, password, confirm_pass]):
+                            st.error("Please fill all fields")
+                        elif password != confirm_pass:
+                            st.error("Passwords don't match")
                         else:
-                            st.error(message)
+                            success, message, result = handle_signup(first_name, last_name, email, password)
+                            if success:
+                                st.session_state.update({
+                                    'first_name': first_name,
+                                    'last_name': last_name,
+                                    'logged_in': True,
+                                    'email': email,
+                                    'id_token': result.get("idToken", "")
+                                })
+                                st.rerun()
+                            else:
+                                st.error(message)
+                st.markdown("</div>", unsafe_allow_html=True)
         
-        st.markdown("</div>", unsafe_allow_html=True)
-        st.markdown("""
-            <div class="footer">
-                © 2023 FactVerify Pro. All rights reserved.
-            </div>
-        """, unsafe_allow_html=True)
         st.markdown("</div>", unsafe_allow_html=True)
 
 # ======================
-# 5. MAIN APP UI
+# 5. MAIN APP UI (UPDATED)
 # ======================
 def show_main_app():
     first_name = st.session_state.get('first_name', '')
     last_name = st.session_state.get('last_name', '')
-    display_name = f"{first_name} {last_name[0]}." if first_name and last_name else st.session_state.email.split('@')[0]
+    display_name = f"{first_name[0].upper()}. {last_name}" if first_name else st.session_state.email.split('@')[0]
     
     # Time-based greeting
     current_hour = datetime.now().hour
     if 5 <= current_hour < 12:
-        greeting = "Good morning"
+        greeting = "Good Morning"
     elif 12 <= current_hour < 17:
-        greeting = "Good afternoon"
+        greeting = "Good Afternoon"
     else:
-        greeting = "Good evening"
+        greeting = "Good Evening"
     
-    st.markdown(f"""
-        <div class="main-container">
-            <div class="dashboard-header">
-                <div class="user-info">
+    # Motivational messages
+    motivational_messages = [
+        "What fact shall we verify today?",
+        "Ready to uncover the truth?",
+        "Knowledge is power - let's find some!",
+        "Every search brings us closer to truth",
+        "Let's explore something fascinating!"
+    ]
+    random_message = random.choice(motivational_messages)
+    
+    # Header with greeting
+    with st.container():
+        col1, col2 = st.columns([5, 1])
+        with col1:
+            st.markdown(f"""
+                <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem;">
                     <div class="user-avatar">
-                        {display_name[0].upper() if display_name else 'U'}
+                        {display_name[0].upper()}
                     </div>
-                    <div class="user-text">
-                        <h3>{greeting}, {display_name}</h3>
-                        <p>Ready to verify some facts?</p>
+                    <div>
+                        <h1 style="margin: 0; color: var(--text); font-size: 1.8rem;">{greeting}, {display_name}</h1>
+                        <p style="margin: 0; color: var(--text-secondary); font-size: 1.1rem;">{random_message}</p>
                     </div>
                 </div>
-                <div>
-                    <button onclick="window.location.href='?logout=true'" style="
-                        background: none;
-                        border: 1px solid var(--border);
-                        border-radius: 6px;
-                        padding: 0.5rem 1rem;
-                        font-size: 0.9rem;
-                        cursor: pointer;
-                        color: var(--text);
-                    ">Log out</button>
-                </div>
-            </div>
-    """, unsafe_allow_html=True)
+            """, unsafe_allow_html=True)
+        with col2:
+            if st.button("Logout", use_container_width=True, key="logout_btn"):
+                st.session_state.clear()
+                st.rerun()
     
-    # Query form
+    # Enhanced query form
     with st.form(key="query_form"):
-        st.markdown("<div class='query-title'>New verification</div>", unsafe_allow_html=True)
-        st.markdown("<div class='query-subtitle'>Enter a statement or question to verify with academic sources</div>", unsafe_allow_html=True)
+        st.markdown("<h2 style='color: var(--text); margin-bottom: 1rem;'>Research Query</h2>", unsafe_allow_html=True)
+        st.markdown("<p style='color: var(--text-secondary); margin-bottom: 1.5rem;'>Enter your question or statement to verify with academic sources</p>", unsafe_allow_html=True)
         
         prompt = st.text_area(
             "Your research query:",
             placeholder="Example: 'What is the current scientific consensus on climate change?'",
-            height=150,
+            height=200,
             key="query_input",
             label_visibility="collapsed"
         )
         
-        submitted = st.form_submit_button("Verify", use_container_width=True)
+        submitted = st.form_submit_button("Verify Information", 
+                                        use_container_width=True,
+                                        type="primary")
         
         if submitted:
             if not prompt:
                 st.warning("Please enter a question")
             else:
-                with st.spinner("Analyzing with academic sources..."):
+                with st.spinner("🔍 Verifying with academic databases..."):
                     response, sources = get_verified_response(prompt)
                     
                     if response:
                         st.markdown(f"""
                             <div class="response-card">
-                                <div class="response-content">
-                                    {response}
-                                </div>
+                                <p style="color: var(--text); font-size: 1.1rem; line-height: 1.6;">{response}</p>
                             </div>
                         """, unsafe_allow_html=True)
                         
                         if sources:
-                            st.markdown("<div class='sources-title'>📚 Verified sources</div>", unsafe_allow_html=True)
+                            st.markdown("""
+                                <div style="margin-top: 2rem;">
+                                    <h3 style="color: var(--text-secondary); margin-bottom: 1rem;">
+                                        📚 Verified Sources:
+                                    </h3>
+                            """, unsafe_allow_html=True)
+                            
                             for source in sources:
                                 st.markdown(f"""
                                     <div class="source-item">
-                                        {source}
+                                        <p style="margin: 0; color: var(--text); font-size: 1rem;">{source}</p>
                                     </div>
                                 """, unsafe_allow_html=True)
+                            
+                            st.markdown("</div>", unsafe_allow_html=True)
                     else:
                         st.error("Failed to get verified response. Please check:")
                         st.error("\n".join(sources) if sources else "Unknown error occurred")
-    
-    st.markdown("""
-        <div class="footer">
-            © 2023 FactVerify Pro. All rights reserved.
-        </div>
-        </div>
-    """, unsafe_allow_html=True)
 
 # ======================
 # 6. APP ROUTING
