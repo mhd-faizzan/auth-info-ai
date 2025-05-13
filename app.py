@@ -13,29 +13,29 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Professional CSS with ChatGPT-like aesthetics
+# Professional Dark Theme CSS
 st.markdown("""
     <style>
-        /* ====== Base Reset & Typography ====== */
+        /* ====== Dark Theme Variables ====== */
         :root {
             --primary: #10A37F;
             --primary-hover: #0E8E6D;
-            --primary-light: rgba(16, 163, 127, 0.1);
-            --secondary: #6E6E80;
-            --bg: #FFFFFF;
-            --card-bg: #F7F7F8;
-            --text: #343541;
-            --text-secondary: #565869;
-            --border: #E5E5E6;
-            --border-dark: #D9D9E3;
+            --primary-light: rgba(16, 163, 127, 0.2);
+            --secondary: #8E8EA0;
+            --bg: #343541;
+            --card-bg: #40414F;
+            --text: #ECECF1;
+            --text-secondary: #ACACBE;
+            --border: #565869;
+            --border-dark: #4E4F60;
             --success: #10B981;
             --error: #EF4146;
             --warning: #F4B740;
             --radius-sm: 4px;
             --radius-md: 6px;
             --radius-lg: 8px;
-            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
-            --shadow-md: 0 2px 4px rgba(0,0,0,0.08);
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.2);
+            --shadow-md: 0 2px 4px rgba(0,0,0,0.3);
             --transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
@@ -84,7 +84,7 @@ st.markdown("""
 
         /* ====== Card Components ====== */
         .card {
-            background: var(--bg);
+            background: var(--card-bg);
             border: 1px solid var(--border);
             border-radius: var(--radius-lg);
             box-shadow: var(--shadow-sm);
@@ -126,7 +126,7 @@ st.markdown("""
             font-size: 14px !important;
             line-height: 1.5;
             color: var(--text) !important;
-            background-color: var(--bg) !important;
+            background-color: var(--card-bg) !important;
             border: 1px solid var(--border-dark) !important;
             border-radius: var(--radius-md) !important;
             transition: var(--transition) !important;
@@ -347,7 +347,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Initialize session state (unchanged)
+# Initialize session state
 if 'logged_in' not in st.session_state:
     st.session_state.update({
         'logged_in': False,
@@ -358,7 +358,7 @@ if 'logged_in' not in st.session_state:
     })
 
 # ======================
-# 2. FIREBASE INTEGRATION (unchanged)
+# 2. FIREBASE INTEGRATION
 # ======================
 def initialize_firebase():
     if not hasattr(st, 'secrets') or "firebase" not in st.secrets:
@@ -430,7 +430,7 @@ def handle_login(email, password):
         return False, f"Connection error: {str(e)}", None
 
 # ======================
-# 3. LLM INTEGRATION (unchanged)
+# 3. LLM INTEGRATION
 # ======================
 def get_verified_response(prompt):
     """Production-ready query with academic sources using Groq API"""
@@ -484,7 +484,7 @@ def get_verified_response(prompt):
         return None, [f"System Error: {str(e)}"]
 
 # ======================
-# 4. AUTHENTICATION UI (Professional redesign)
+# 4. AUTHENTICATION UI
 # ======================
 def show_auth_ui():
     st.markdown("""
@@ -496,7 +496,7 @@ def show_auth_ui():
     """, unsafe_allow_html=True)
     
     with st.container():
-        st.markdown("<div class='auth-card'>", unsafe_allow_html=True)
+        st.markdown("<div class='auth-card card'>", unsafe_allow_html=True)
         
         tab1, tab2 = st.tabs(["Login", "Sign Up"])
         
@@ -570,7 +570,7 @@ def show_auth_ui():
         st.markdown("</div>", unsafe_allow_html=True)
 
 # ======================
-# 5. MAIN APP UI (Professional redesign)
+# 5. MAIN APP UI
 # ======================
 def show_main_app():
     first_name = st.session_state.get('first_name', '')
@@ -586,15 +586,15 @@ def show_main_app():
     else:
         greeting = "Good evening"
     
-    st.markdown("""
+    st.markdown(f"""
         <div class="main-container">
             <div class="dashboard-header">
                 <div class="user-info">
                     <div class="user-avatar">
-                        {0}
+                        {display_name[0].upper() if display_name else 'U'}
                     </div>
                     <div class="user-text">
-                        <h3>{1}, {2}</h3>
+                        <h3>{greeting}, {display_name}</h3>
                         <p>Ready to verify some facts?</p>
                     </div>
                 </div>
@@ -610,11 +610,7 @@ def show_main_app():
                     ">Log out</button>
                 </div>
             </div>
-    """.format(
-        display_name[0].upper(),
-        greeting,
-        display_name
-    ), unsafe_allow_html=True)
+    """, unsafe_allow_html=True)
     
     # Query form
     with st.form(key="query_form"):
@@ -641,12 +637,14 @@ def show_main_app():
                     if response:
                         st.markdown(f"""
                             <div class="response-card">
-                                {response}
+                                <div class="response-content">
+                                    {response}
+                                </div>
                             </div>
                         """, unsafe_allow_html=True)
                         
                         if sources:
-                            st.markdown("<div class='sources-title'>Verified sources</div>", unsafe_allow_html=True)
+                            st.markdown("<div class='sources-title'>📚 Verified sources</div>", unsafe_allow_html=True)
                             for source in sources:
                                 st.markdown(f"""
                                     <div class="source-item">
@@ -665,7 +663,7 @@ def show_main_app():
     """, unsafe_allow_html=True)
 
 # ======================
-# 6. APP ROUTING (unchanged)
+# 6. APP ROUTING
 # ======================
 if not st.session_state.logged_in:
     show_auth_ui()
