@@ -7,7 +7,7 @@ import random
 # 1. INITIALIZATION & CONFIG
 # ======================
 st.set_page_config(
-    page_title="FactVerify",
+    page_title="FactVerify Ai ",
     page_icon="🔍",
     layout="wide",
     initial_sidebar_state="collapsed"
