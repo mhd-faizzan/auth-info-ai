@@ -16,42 +16,43 @@ st.set_page_config(
 # Professional Dark Theme CSS
 st.markdown("""
     <style>
-        /* ====== Dark Theme Variables ====== */
+        /* ====== WhatsApp Dark Theme Variables ====== */
         :root {
-            --primary: #10A37F;
-            --primary-hover: #0E8E6D;
-            --primary-light: rgba(16, 163, 127, 0.2);
-            --secondary: #8E8EA0;
-            --bg: #343541;
-            --card-bg: #40414F;
-            --text: #ECECF1;
-            --text-secondary: #ACACBE;
-            --border: #565869;
-            --border-dark: #4E4F60;
-            --success: #10B981;
-            --error: #EF4146;
-            --warning: #F4B740;
+            --primary: #00A884;  /* WhatsApp green */
+            --primary-hover: #008F74;
+            --primary-light: rgba(0, 168, 132, 0.2);
+            --secondary: #8696A0;
+            --bg: #111B21;       /* WhatsApp dark bg */
+            --card-bg: #202C33;  /* Slightly lighter than bg */
+            --text: #E9EDEF;     /* WhatsApp light text */
+            --text-secondary: #AEBAC1;
+            --border: #2A3942;    /* WhatsApp border color */
+            --border-dark: #222E35;
+            --success: #00A884;
+            --error: #F15C6D;
+            --warning: #FFB347;
             --radius-sm: 4px;
             --radius-md: 6px;
             --radius-lg: 8px;
-            --shadow-sm: 0 1px 2px rgba(0,0,0,0.2);
-            --shadow-md: 0 2px 4px rgba(0,0,0,0.3);
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.1);
+            --shadow-md: 0 2px 4px rgba(0,0,0,0.2);
             --transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        * {
-            box-sizing: border-box;
+        /* ====== Logout Button Fix ====== */
+        .logout-btn {
+            background: transparent !important;
+            border: 1px solid var(--border) !important;
+            border-radius: var(--radius-md) !important;
+            padding: 0.5rem 1rem !important;
+            font-size: 0.9rem !important;
+            color: var(--text) !important;
+            cursor: pointer !important;
+            transition: var(--transition) !important;
         }
 
-        html, body, .stApp {
-            font-family: -apple-system, BlinkMacSystemFont, 
-                       'Segoe UI', Roboto, Oxygen-Sans, 
-                       Ubuntu, Cantarell, 'Helvetica Neue', 
-                       sans-serif;
-            line-height: 1.5;
-            -webkit-font-smoothing: antialiased;
-            background-color: var(--bg) !important;
-            color: var(--text) !important;
+        .logout-btn:hover {
+            background: var(--card-bg) !important;
         }
 
         /* ====== Layout Structure ====== */
