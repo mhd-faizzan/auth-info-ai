@@ -1,7 +1,7 @@
 import streamlit as st
 import requests
 from datetime import datetime
-import random  # Added for motivational quotes
+import random
 
 # ======================
 # 1. INITIALIZATION & CONFIG
@@ -59,7 +59,7 @@ if 'logged_in' not in st.session_state:
     })
 
 # ======================
-# 2. FIREBASE INTEGRATION
+# 2. FIREBASE INTEGRATION (UPDATED)
 # ======================
 def initialize_firebase():
     if not hasattr(st, 'secrets') or "firebase" not in st.secrets:
@@ -84,7 +84,21 @@ def handle_signup(first_name, last_name, email, password):
             timeout=10
         )
         if response.status_code == 200:
-            return True, "Account created successfully!", response.json()
+            # Update user profile with name
+            update_response = requests.post(
+                f"https://identitytoolkit.googleapis.com/v1/accounts:update?key={firebase_config['apiKey']}",
+                json={
+                    "idToken": response.json().get("idToken", ""),
+                    "displayName": f"{first_name} {last_name}",
+                    "returnSecureToken": True
+                },
+                timeout=10
+            )
+            return True, "Account created successfully!", {
+                "idToken": response.json().get("idToken", ""),
+                "first_name": first_name,
+                "last_name": last_name
+            }
         error = response.json().get("error", {}).get("message", "Unknown error")
         return False, error, None
     except Exception as e:
@@ -98,7 +112,19 @@ def handle_login(email, password):
             timeout=10
         )
         if response.status_code == 200:
-            return True, "Login successful!", response.json()
+            # Get user info from Firebase
+            user_info = requests.post(
+                f"https://identitytoolkit.googleapis.com/v1/accounts:lookup?key={firebase_config['apiKey']}",
+                json={"idToken": response.json().get("idToken", "")},
+                timeout=10
+            )
+            user_data = user_info.json().get("users", [{}])[0]
+            names = user_data.get("displayName", "").split() if user_data.get("displayName") else []
+            return True, "Login successful!", {
+                "idToken": response.json().get("idToken", ""),
+                "first_name": names[0] if len(names) > 0 else "",
+                "last_name": names[-1] if len(names) > 1 else ""
+            }
         error = response.json().get("error", {}).get("message", "Unknown error")
         return False, error, None
     except Exception as e:
@@ -159,7 +185,7 @@ def get_verified_response(prompt):
         return None, [f"System Error: {str(e)}"]
 
 # ======================
-# 4. AUTHENTICATION UI
+# 4. AUTHENTICATION UI (UPDATED)
 # ======================
 def show_auth_ui():
     with st.container():
@@ -170,7 +196,6 @@ def show_auth_ui():
                         🔍 FactVerify
                     </span>
                 </h1>
-                <p style="color: var(--text-secondary)">Academic-grade verification</p>
             </div>
         """, unsafe_allow_html=True)
         
@@ -191,7 +216,9 @@ def show_auth_ui():
                                 st.session_state.update({
                                     'logged_in': True,
                                     'email': email,
-                                    'id_token': result.get("idToken", "")
+                                    'id_token': result.get("idToken", ""),
+                                    'first_name': result.get("first_name", ""),
+                                    'last_name': result.get("last_name", "")
                                 })
                                 st.rerun()
                             else:
@@ -286,7 +313,7 @@ def show_main_app():
                 st.session_state.clear()
                 st.rerun()
     
-    # Query form (unchanged except removed the empty box)
+    # Query form
     with st.form(key="query_form"):
         st.markdown("<div class='custom-card'>", unsafe_allow_html=True)
         
