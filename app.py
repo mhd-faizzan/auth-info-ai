@@ -237,7 +237,7 @@ def show_auth_ui():
             st.markdown("</div>", unsafe_allow_html=True)
 
 # ======================
-# 5. MAIN APP UI (UPDATED VERSION)
+# 5. MAIN APP UI (UPDATED)
 # ======================
 def show_main_app():
     first_name = st.session_state.get('first_name', '')
@@ -253,16 +253,17 @@ def show_main_app():
     else:
         greeting = "Good Evening"
     
-    # Motivational quotes
-    motivational_quotes = [
-        "What knowledge shall we uncover today?",
-        "Ready to explore new insights?",
-        "Let's discover something amazing!",
-        "The truth is waiting to be found...",
-        "Every search brings new wisdom."
+    # Motivational messages
+    motivational_messages = [
+        "What fact shall we verify today?",
+        "Ready to uncover the truth?",
+        "Knowledge is power - let's find some!",
+        "Every search brings us closer to truth",
+        "Let's explore something fascinating!"
     ]
-    random_quote = random.choice(motivational_quotes)
+    random_message = random.choice(motivational_messages)
     
+    # Header with greeting
     with st.container():
         col1, col2 = st.columns([4, 1])
         with col1:
@@ -276,7 +277,7 @@ def show_main_app():
                     </div>
                     <div>
                         <h1 style="margin: 0; color: var(--text);">{greeting}, {display_name}</h1>
-                        <p style="margin: 0; color: var(--text-secondary);">{random_quote}</p>
+                        <p style="margin: 0; color: var(--text-secondary);">{random_message}</p>
                     </div>
                 </div>
             """, unsafe_allow_html=True)
@@ -285,6 +286,7 @@ def show_main_app():
                 st.session_state.clear()
                 st.rerun()
     
+    # Query form (unchanged except removed the empty box)
     with st.form(key="query_form"):
         st.markdown("<div class='custom-card'>", unsafe_allow_html=True)
         
