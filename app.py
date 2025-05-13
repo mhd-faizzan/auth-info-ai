@@ -1,6 +1,7 @@
 import streamlit as st
 import requests
 from datetime import datetime
+import random  # Added for motivational quotes
 
 # ======================
 # 1. INITIALIZATION & CONFIG
@@ -104,7 +105,7 @@ def handle_login(email, password):
         return False, f"Connection error: {str(e)}", None
 
 # ======================
-# 3. LLM INTEGRATION (DEBUGGED VERSION)
+# 3. LLM INTEGRATION
 # ======================
 def get_verified_response(prompt):
     """Production-ready query with academic sources using Groq API"""
@@ -117,9 +118,8 @@ def get_verified_response(prompt):
             "Content-Type": "application/json"
         }
         
-        # Updated for Groq API with available models
         payload = {
-            "model": "llama3-70b-8192",  # Groq's available model
+            "model": "llama3-70b-8192",
             "messages": [
                 {
                     "role": "system",
@@ -139,14 +139,11 @@ def get_verified_response(prompt):
         }
         
         response = requests.post(
-            st.secrets.llama.api_url,  # Using your Groq endpoint
+            st.secrets.llama.api_url,
             headers=headers,
             json=payload,
             timeout=60
         )
-        
-        # Debug: Print response for troubleshooting
-        print(f"API Response: {response.status_code}, {response.text}")
         
         if response.status_code == 200:
             content = response.json()["choices"][0]["message"]["content"]
@@ -160,6 +157,7 @@ def get_verified_response(prompt):
         
     except Exception as e:
         return None, [f"System Error: {str(e)}"]
+
 # ======================
 # 4. AUTHENTICATION UI
 # ======================
@@ -239,12 +237,31 @@ def show_auth_ui():
             st.markdown("</div>", unsafe_allow_html=True)
 
 # ======================
-# 5. MAIN APP UI (DEBUGGED VERSION)
+# 5. MAIN APP UI (UPDATED VERSION)
 # ======================
 def show_main_app():
     first_name = st.session_state.get('first_name', '')
     last_name = st.session_state.get('last_name', '')
     display_name = f"{first_name[0].upper()}. {last_name}" if first_name else st.session_state.email.split('@')[0]
+    
+    # Time-based greeting
+    current_hour = datetime.now().hour
+    if 5 <= current_hour < 12:
+        greeting = "Good Morning"
+    elif 12 <= current_hour < 17:
+        greeting = "Good Afternoon"
+    else:
+        greeting = "Good Evening"
+    
+    # Motivational quotes
+    motivational_quotes = [
+        "What knowledge shall we uncover today?",
+        "Ready to explore new insights?",
+        "Let's discover something amazing!",
+        "The truth is waiting to be found...",
+        "Every search brings new wisdom."
+    ]
+    random_quote = random.choice(motivational_quotes)
     
     with st.container():
         col1, col2 = st.columns([4, 1])
@@ -258,8 +275,8 @@ def show_main_app():
                         {display_name[0].upper()}
                     </div>
                     <div>
-                        <h1 style="margin: 0; color: var(--text);">Welcome back, {display_name}</h1>
-                        <p style="margin: 0; color: var(--text-secondary);">Ready to verify some facts?</p>
+                        <h1 style="margin: 0; color: var(--text);">{greeting}, {display_name}</h1>
+                        <p style="margin: 0; color: var(--text-secondary);">{random_quote}</p>
                     </div>
                 </div>
             """, unsafe_allow_html=True)
@@ -315,7 +332,7 @@ def show_main_app():
                         st.error("\n".join(sources) if sources else "Unknown error occurred")
         
         st.markdown("</div>", unsafe_allow_html=True)
-        
+
 # ======================
 # 6. APP ROUTING
 # ======================
