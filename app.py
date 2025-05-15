@@ -410,6 +410,36 @@ def show_main_app():
                 st.session_state.clear()
                 st.rerun()
     
+    # Feedback section in sidebar
+    with st.sidebar:
+        st.markdown("""
+            <div style="background: var(--card-bg); padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem;">
+                <h3 style="color: var(--primary); margin-top: 0;">Help Us Improve</h3>
+                <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.5;">
+                    Your feedback helps us enhance FactVerify Pro for everyone. Share your thoughts 
+                    about your experience, suggest improvements, or report any issues you encountered.
+                </p>
+                <p style="color: var(--text-secondary); font-size: 0.85rem; font-style: italic;">
+                    "Great products are built through continuous improvement based on user feedback."
+                </p>
+                <a href="https://docs.google.com/forms/d/e/1FAIpQLSdlh_ogw2I3hByMMGTJRFtWwAzKWklAAzFvO7g7ApinQ6jaSw/viewform" target="_blank">
+                    <button style="
+                        background: var(--primary);
+                        color: white;
+                        border: none;
+                        padding: 0.75rem 1.5rem;
+                        border-radius: 8px;
+                        font-weight: 500;
+                        width: 100%;
+                        cursor: pointer;
+                        transition: all 0.2s ease;
+                    ">
+                        Share Your Feedback
+                    </button>
+                </a>
+            </div>
+        """, unsafe_allow_html=True)
+    
     # Enhanced query form
     with st.form(key="query_form"):
         st.markdown("<h2 style='color: var(--text); margin-bottom: 1rem;'>Research Query</h2>", unsafe_allow_html=True)
@@ -460,7 +490,7 @@ def show_main_app():
                     else:
                         st.error("Failed to get verified response. Please check:")
                         st.error("\n".join(sources) if sources else "Unknown error occurred")
-
+                        
 # ======================
 # 6. APP ROUTING
 # ======================
