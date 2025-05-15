@@ -2,15 +2,16 @@ import streamlit as st
 import requests
 from datetime import datetime
 import random
+from streamlit.components.v1 import html
 
 # ======================
 # 1. INITIALIZATION & CONFIG
 # ======================
 st.set_page_config(
-    page_title="FactVerify Ai ",
+    page_title="FactVerify Ai",
     page_icon="🔍",
     layout="wide",
-    initial_sidebar_state="collapsed"
+    initial_sidebar_state="expanded"
 )
 
 # Enhanced dark theme CSS with modern professional look
@@ -130,6 +131,55 @@ st.markdown("""
             border-radius: 10px;
             border-left: 4px solid var(--primary);
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Sidebar specific styles */
+        section[data-testid="stSidebar"] {
+            background-color: var(--card-bg) !important;
+            border-right: 1px solid var(--border) !important;
+        }
+        
+        .feedback-container {
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .feedback-title {
+            color: var(--primary) !important;
+            margin-top: 0 !important;
+        }
+        
+        .feedback-text {
+            color: var(--text-secondary) !important;
+            font-size: 0.9rem !important;
+            line-height: 1.5 !important;
+        }
+        
+        .feedback-quote {
+            color: var(--text-secondary) !important;
+            font-size: 0.85rem !important;
+            font-style: italic !important;
+        }
+        
+        /* Custom link button style */
+        .link-button {
+            display: inline-block;
+            background: var(--primary);
+            color: white !important;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-align: center;
+            text-decoration: none;
+            font-weight: 500;
+            width: 100%;
+            transition: all 0.2s ease;
+        }
+        
+        .link-button:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            color: white;
         }
     </style>
 """, unsafe_allow_html=True)
@@ -409,6 +459,29 @@ def show_main_app():
             if st.button("Logout", use_container_width=True, key="logout_btn"):
                 st.session_state.clear()
                 st.rerun()
+    
+    # Feedback section in sidebar - Now with reliable link
+    with st.sidebar:
+        st.markdown("""
+            <div class="feedback-container">
+                <h3 class="feedback-title">Help Us Improve</h3>
+                <p class="feedback-text">
+                    Your feedback helps us enhance FactVerify Pro for everyone. Share your thoughts 
+                    about your experience, suggest improvements, or report any issues you encountered.
+                </p>
+                <p class="feedback-quote">
+                    "Great products are built through continuous improvement based on user feedback."
+                </p>
+            </div>
+        """, unsafe_allow_html=True)
+        
+        # Using markdown with link styled as a button
+        feedback_url = "https://docs.google.com/forms/d/e/1FAIpQLSdlh_ogw2I3hByMMGTJRFtWwAzKWklAAzFvO7g7ApinQ6jaSw/viewform"
+        st.markdown(f"""
+            <a href="{feedback_url}" target="_blank" class="link-button">
+                Share Your Feedback
+            </a>
+        """, unsafe_allow_html=True)
     
     # Enhanced query form
     with st.form(key="query_form"):
