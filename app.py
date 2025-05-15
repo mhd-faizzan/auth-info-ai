@@ -328,7 +328,7 @@ def show_auth_ui():
     st.markdown("""
         <div class="header-container">
             <h1 style="color: var(--primary); font-size: 2.5rem; margin-bottom: 0.5rem;">
-                🔍 FactVerify Pro
+                🔍 FactVerify Ai
             </h1>
             <p style="color: var(--text-secondary); font-size: 1.1rem;">
                 Academic-grade fact verification at your fingertips
@@ -466,7 +466,7 @@ def show_main_app():
             <div class="feedback-container">
                 <h3 class="feedback-title">Help Us Improve</h3>
                 <p class="feedback-text">
-                    Your feedback helps us enhance FactVerify Pro for everyone. Share your thoughts 
+                    Your feedback helps us enhance FactVerify Ai for everyone. Share your thoughts 
                     about your experience, suggest improvements, or report any issues you encountered.
                 </p>
                 <p class="feedback-quote">
