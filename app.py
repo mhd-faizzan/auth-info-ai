@@ -2,16 +2,15 @@ import streamlit as st
 import requests
 from datetime import datetime
 import random
-import webbrowser
 
 # ======================
 # 1. INITIALIZATION & CONFIG
 # ======================
 st.set_page_config(
-    page_title="FactVerify Ai",
+    page_title="FactVerify Ai ",
     page_icon="🔍",
     layout="wide",
-    initial_sidebar_state="expanded"  # Changed to expanded to show sidebar by default
+    initial_sidebar_state="collapsed"
 )
 
 # Enhanced dark theme CSS with modern professional look
@@ -131,34 +130,6 @@ st.markdown("""
             border-radius: 10px;
             border-left: 4px solid var(--primary);
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        
-        /* Sidebar specific styles */
-        section[data-testid="stSidebar"] {
-            background-color: var(--card-bg) !important;
-            border-right: 1px solid var(--border) !important;
-        }
-        
-        .feedback-container {
-            padding: 1.5rem;
-            margin-bottom: 2rem;
-        }
-        
-        .feedback-title {
-            color: var(--primary) !important;
-            margin-top: 0 !important;
-        }
-        
-        .feedback-text {
-            color: var(--text-secondary) !important;
-            font-size: 0.9rem !important;
-            line-height: 1.5 !important;
-        }
-        
-        .feedback-quote {
-            color: var(--text-secondary) !important;
-            font-size: 0.85rem !important;
-            font-style: italic !important;
         }
     </style>
 """, unsafe_allow_html=True)
@@ -438,23 +409,6 @@ def show_main_app():
             if st.button("Logout", use_container_width=True, key="logout_btn"):
                 st.session_state.clear()
                 st.rerun()
-    
-    # Feedback section in sidebar
-    with st.sidebar:
-        st.markdown("""
-            <div class="feedback-container">
-                <h3 class="feedback-title">Help Us Improve</h3>
-                <p class="feedback-text">
-                    Your feedback helps us enhance FactVerify Pro for everyone. Share your thoughts 
-                    about your experience, suggest improvements, or report any issues you encountered.
-                </p>
-                <p class="feedback-quote">
-                    "Great products are built through continuous improvement based on user feedback."
-                </p>
-        """, unsafe_allow_html=True)
-        
-        if st.button("Share Your Feedback", key="feedback_btn"):
-            webbrowser.open_new_tab("https://docs.google.com/forms/d/e/1FAIpQLSdlh_ogw2I3hByMMGTJRFtWwAzKWklAAzFvO7g7ApinQ6jaSw/viewform")
     
     # Enhanced query form
     with st.form(key="query_form"):
