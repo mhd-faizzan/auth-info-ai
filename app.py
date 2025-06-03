@@ -14,21 +14,22 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# DeepSeek-inspired grey theme
+# Improved light theme with better button visibility
 st.markdown("""
     <style>
         :root {
-            --primary: #4B5563;
-            --primary-hover: #374151;
-            --secondary: #6B7280;
-            --bg: #F9FAFB;
-            --card-bg: #FFFFFF;
+            --primary: #2563EB;
+            --primary-hover: #1D4ED8;
+            --secondary: #3B82F6;
+            --bg: #FFFFFF;
+            --card-bg: #F9FAFB;
             --text: #111827;
             --text-secondary: #6B7280;
             --border: #E5E7EB;
             --success: #10B981;
-            --accent: #9CA3AF;
-            --highlight: #F3F4F6;
+            --accent: #60A5FA;
+            --highlight: #EFF6FF;
+            --button-text: #FFFFFF;
         }
         
         .stApp {
@@ -58,6 +59,33 @@ st.markdown("""
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
         }
         
+        /* Improved tab styling for better visibility */
+        .stTabs [data-baseweb="tab-list"] {
+            gap: 8px;
+            background: var(--card-bg);
+            padding: 4px;
+            border-radius: 8px;
+        }
+        
+        .stTabs [data-baseweb="tab"] {
+            padding: 12px 24px;
+            border-radius: 8px;
+            background: transparent;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+        }
+        
+        .stTabs [aria-selected="true"] {
+            background: var(--primary) !important;
+            color: white !important;
+            border-color: var(--primary);
+        }
+        
+        .stTabs [aria-selected="false"] {
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+        }
+        
         .stTextInput input, .stTextInput input:focus,
         .stTextArea textarea, .stTextArea textarea:focus {
             background: white !important;
@@ -65,13 +93,12 @@ st.markdown("""
             color: var(--text) !important;
             padding: 12px !important;
             border-radius: 8px !important;
-            transition: all 0.2s ease;
         }
         
         .stTextInput input:focus, 
         .stTextArea textarea:focus {
             border-color: var(--primary) !important;
-            box-shadow: 0 0 0 2px rgba(75, 85, 99, 0.1) !important;
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1) !important;
         }
         
         .stButton button {
@@ -88,22 +115,6 @@ st.markdown("""
             background: var(--primary-hover) !important;
             transform: translateY(-1px);
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        
-        .stTabs [data-baseweb="tab-list"] {
-            gap: 8px;
-        }
-        
-        .stTabs [data-baseweb="tab"] {
-            padding: 12px 24px;
-            border-radius: 8px;
-            background: transparent;
-            transition: all 0.2s ease;
-        }
-        
-        .stTabs [aria-selected="true"] {
-            background: var(--primary) !important;
-            color: white !important;
         }
         
         .source-item {
@@ -359,7 +370,7 @@ def get_verified_response(prompt):
         return None, [f"System Error: {str(e)}"]
 
 # ======================
-# 4. AUTHENTICATION UI
+# 4. AUTHENTICATION UI (IMPROVED BUTTON VISIBILITY)
 # ======================
 def show_auth_ui():
     # Clean header with grey theme
@@ -374,11 +385,12 @@ def show_auth_ui():
         </div>
     """, unsafe_allow_html=True)
     
-    # Centered auth form with clean design
+    # Centered auth form with improved tab visibility
     with st.container():
         st.markdown("<div class='auth-container'>", unsafe_allow_html=True)
         
-        tab1, tab2 = st.tabs(["Login", "Sign Up"])
+        # Use columns to make tabs more visible
+        tab1, tab2 = st.tabs(["   Login   ", "   Sign Up   "])
         
         with tab1:
             with st.container():
@@ -389,25 +401,23 @@ def show_auth_ui():
                     email = st.text_input("Email", placeholder="your@email.com", key="login_email")
                     password = st.text_input("Password", type="password", key="login_pass")
                     
-                    col1, col2 = st.columns([3, 1])
-                    with col1:
-                        if st.form_submit_button("Login", use_container_width=True):
-                            if email and password:
-                                success, message, result = handle_login(email, password)
-                                if success:
-                                    st.session_state.update({
-                                        'logged_in': True,
-                                        'email': email,
-                                        'id_token': result.get("idToken", ""),
-                                        'first_name': result.get("first_name", ""),
-                                        'last_name': result.get("last_name", "")
-                                    })
-                                    st.rerun()
-                                else:
-                                    st.error(message)
+                    if st.form_submit_button("Login", use_container_width=True):
+                        if email and password:
+                            success, message, result = handle_login(email, password)
+                            if success:
+                                st.session_state.update({
+                                    'logged_in': True,
+                                    'email': email,
+                                    'id_token': result.get("idToken", ""),
+                                    'first_name': result.get("first_name", ""),
+                                    'last_name': result.get("last_name", "")
+                                })
+                                st.rerun()
                             else:
-                                st.error("Please fill all fields")
-                    st.markdown("</div>", unsafe_allow_html=True)
+                                st.error(message)
+                        else:
+                            st.error("Please fill all fields")
+                st.markdown("</div>", unsafe_allow_html=True)
         
         with tab2:
             with st.container():
