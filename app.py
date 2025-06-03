@@ -14,21 +14,21 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Premium dark theme with vibrant accents for presentations
+# DeepSeek-inspired grey theme
 st.markdown("""
     <style>
         :root {
-            --primary: #6C63FF;
-            --primary-hover: #5A52E0;
-            --secondary: #A5A7FF;
-            --bg: #121212;
-            --card-bg: #1E1E1E;
-            --text: #FFFFFF;
-            --text-secondary: #B0B0B0;
-            --border: #2E2E2E;
-            --success: #00C853;
-            --accent: #FF6584;
-            --accent-hover: #E04D6B;
+            --primary: #4B5563;
+            --primary-hover: #374151;
+            --secondary: #6B7280;
+            --bg: #F9FAFB;
+            --card-bg: #FFFFFF;
+            --text: #111827;
+            --text-secondary: #6B7280;
+            --border: #E5E7EB;
+            --success: #10B981;
+            --accent: #9CA3AF;
+            --highlight: #F3F4F6;
         }
         
         .stApp {
@@ -36,7 +36,6 @@ st.markdown("""
             color: var(--text) !important;
             max-width: 1200px !important;
             margin: 0 auto !important;
-            background-image: radial-gradient(circle at 25% 25%, rgba(108, 99, 255, 0.15) 0%, transparent 55%);
         }
         
         .header-container {
@@ -53,28 +52,26 @@ st.markdown("""
         
         .auth-card {
             background: var(--card-bg);
-            border-radius: 16px;
+            border-radius: 12px;
             padding: 2.5rem;
             border: 1px solid var(--border);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
         }
         
         .stTextInput input, .stTextInput input:focus,
         .stTextArea textarea, .stTextArea textarea:focus {
-            background: #2A2A2A !important;
+            background: white !important;
             border: 1px solid var(--border) !important;
             color: var(--text) !important;
             padding: 12px !important;
-            border-radius: 12px !important;
-            transition: all 0.3s ease;
+            border-radius: 8px !important;
+            transition: all 0.2s ease;
         }
         
         .stTextInput input:focus, 
         .stTextArea textarea:focus {
             border-color: var(--primary) !important;
-            box-shadow: 0 0 0 2px rgba(108, 99, 255, 0.2) !important;
+            box-shadow: 0 0 0 2px rgba(75, 85, 99, 0.1) !important;
         }
         
         .stButton button {
@@ -82,16 +79,15 @@ st.markdown("""
             color: white !important;
             border: none !important;
             padding: 12px 24px !important;
-            border-radius: 12px !important;
-            font-weight: 600 !important;
-            transition: all 0.3s ease !important;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 8px !important;
+            font-weight: 500 !important;
+            transition: all 0.2s ease !important;
         }
         
         .stButton button:hover {
             background: var(--primary-hover) !important;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(108, 99, 255, 0.25);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
         
         .stTabs [data-baseweb="tab-list"] {
@@ -100,98 +96,88 @@ st.markdown("""
         
         .stTabs [data-baseweb="tab"] {
             padding: 12px 24px;
-            border-radius: 12px;
+            border-radius: 8px;
             background: transparent;
-            transition: all 0.3s ease;
-            font-weight: 500;
+            transition: all 0.2s ease;
         }
         
         .stTabs [aria-selected="true"] {
             background: var(--primary) !important;
             color: white !important;
-            font-weight: 600;
         }
         
         .source-item {
-            padding: 1.25rem;
-            margin: 1rem 0;
-            background: #2A2A2A;
-            border-radius: 12px;
+            padding: 1rem;
+            margin: 0.75rem 0;
+            background: white;
+            border-radius: 8px;
             border-left: 4px solid var(--primary);
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border);
         }
         
         .source-item:hover {
-            transform: translateX(8px);
-            background: #333333;
+            transform: translateX(4px);
+            background: var(--highlight);
         }
         
         .user-avatar {
-            width: 60px;
-            height: 60px;
+            width: 56px;
+            height: 56px;
             border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary), var(--accent));
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
             font-weight: bold;
-            font-size: 1.5rem;
-            margin-right: 1.5rem;
-            box-shadow: 0 4px 12px rgba(108, 99, 255, 0.3);
+            font-size: 1.4rem;
+            margin-right: 1rem;
         }
         
         .response-card {
             margin-top: 2rem;
-            padding: 2rem;
-            background: #2A2A2A;
-            border-radius: 16px;
+            padding: 1.5rem;
+            background: white;
+            border-radius: 10px;
             border-left: 4px solid var(--primary);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-            transition: all 0.3s ease;
-        }
-        
-        .response-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border);
         }
         
         /* Sidebar specific styles */
         section[data-testid="stSidebar"] {
             background-color: var(--card-bg) !important;
             border-right: 1px solid var(--border) !important;
-            background-image: radial-gradient(circle at 75% 25%, rgba(108, 99, 255, 0.1) 0%, transparent 55%);
         }
         
         .feedback-container {
-            padding: 1.75rem;
+            padding: 1.5rem;
             margin-bottom: 2rem;
-            background: #2A2A2A;
-            border-radius: 16px;
+            background: white;
+            border-radius: 8px;
             border: 1px solid var(--border);
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
         }
         
         .feedback-title {
             color: var(--primary) !important;
             margin-top: 0 !important;
-            font-size: 1.25rem !important;
         }
         
         .feedback-text {
             color: var(--text-secondary) !important;
-            font-size: 0.95rem !important;
-            line-height: 1.6 !important;
+            font-size: 0.9rem !important;
+            line-height: 1.5 !important;
         }
         
         .feedback-quote {
-            color: var(--secondary) !important;
-            font-size: 0.9rem !important;
+            color: var(--text-secondary) !important;
+            font-size: 0.85rem !important;
             font-style: italic !important;
             border-left: 3px solid var(--primary);
             padding-left: 1rem;
-            margin-top: 1rem;
         }
         
         /* Custom link button style */
@@ -199,72 +185,39 @@ st.markdown("""
             display: inline-block;
             background: var(--primary);
             color: white !important;
-            padding: 14px 28px;
-            border-radius: 12px;
+            padding: 12px 24px;
+            border-radius: 8px;
             text-align: center;
             text-decoration: none;
-            font-weight: 600;
+            font-weight: 500;
             width: 100%;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            margin-top: 1.5rem;
+            transition: all 0.2s ease;
         }
         
         .link-button:hover {
             background: var(--primary-hover);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 12px rgba(108, 99, 255, 0.25);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             color: white;
-        }
-        
-        /* Glow effect for presentation focus */
-        .glow-effect {
-            animation: glow 2s ease-in-out infinite alternate;
-        }
-        
-        @keyframes glow {
-            from {
-                box-shadow: 0 0 5px rgba(108, 99, 255, 0.5);
-            }
-            to {
-                box-shadow: 0 0 20px rgba(108, 99, 255, 0.8);
-            }
         }
         
         /* Custom scrollbar */
         ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
+            width: 6px;
+            height: 6px;
         }
         
         ::-webkit-scrollbar-track {
-            background: var(--card-bg);
+            background: var(--bg);
         }
         
         ::-webkit-scrollbar-thumb {
             background: var(--primary);
-            border-radius: 4px;
+            border-radius: 3px;
         }
         
         ::-webkit-scrollbar-thumb:hover {
             background: var(--primary-hover);
-        }
-        
-        /* Pulse animation for important elements */
-        .pulse {
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0% {
-                transform: scale(1);
-            }
-            50% {
-                transform: scale(1.02);
-            }
-            100% {
-                transform: scale(1);
-            }
         }
     </style>
 """, unsafe_allow_html=True)
@@ -409,20 +362,19 @@ def get_verified_response(prompt):
 # 4. AUTHENTICATION UI
 # ======================
 def show_auth_ui():
-    # Vibrant header with accent colors
+    # Clean header with grey theme
     st.markdown("""
         <div class="header-container">
-            <h1 style="color: var(--primary); font-size: 2.75rem; margin-bottom: 0.5rem;">
-                🔍 <span style="background: linear-gradient(135deg, var(--primary), var(--accent)); 
-                -webkit-background-clip: text; background-clip: text; color: transparent;">FactVerify Ai</span>
+            <h1 style="color: var(--primary); font-size: 2.5rem; margin-bottom: 0.5rem;">
+                🔍 FactVerify Ai
             </h1>
-            <p style="color: var(--text-secondary); font-size: 1.2rem;">
+            <p style="color: var(--text-secondary); font-size: 1.1rem;">
                 Academic-grade fact verification at your fingertips
             </p>
         </div>
     """, unsafe_allow_html=True)
     
-    # Centered auth form with premium design
+    # Centered auth form with clean design
     with st.container():
         st.markdown("<div class='auth-container'>", unsafe_allow_html=True)
         
@@ -532,7 +484,7 @@ def show_main_app():
         with col1:
             st.markdown(f"""
                 <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem;">
-                    <div class="user-avatar pulse">
+                    <div class="user-avatar">
                         {display_name[0].upper()}
                     </div>
                     <div>
@@ -549,7 +501,7 @@ def show_main_app():
     # Feedback section in sidebar
     with st.sidebar:
         st.markdown("""
-            <div class="feedback-container glow-effect">
+            <div class="feedback-container">
                 <h3 class="feedback-title">Help Us Improve</h3>
                 <p class="feedback-text">
                     Your feedback helps us enhance FactVerify Ai for everyone. Share your thoughts 
