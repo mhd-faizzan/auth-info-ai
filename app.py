@@ -14,118 +14,28 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Professional DeepSeek-inspired theme with enhanced UI
+# Enhanced dark theme CSS with modern professional look
 st.markdown("""
     <style>
         :root {
-            --primary: #2563EB;
-            --primary-hover: #1D4ED8;
-            --secondary: #3B82F6;
-            --bg: #0F172A;
+            --primary: #4A6FA5;
+            --primary-hover: #3A5A8C;
+            --secondary: #65676B;
+            --bg: #0E1117;
             --card-bg: #1E293B;
             --text: #F8FAFC;
             --text-secondary: #94A3B8;
             --border: #334155;
             --success: #10B981;
-            --accent: #60A5FA;
-            --highlight: #1E40AF;
-            --button-text: #FFFFFF;
-            --sidebar-width: 300px;
         }
         
-        /* Base styles */
-        html, body, .stApp {
+        .stApp {
             background-color: var(--bg) !important;
             color: var(--text) !important;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+            max-width: 1200px !important;
+            margin: 0 auto !important;
         }
         
-        /* Main container */
-        .main .block-container {
-            max-width: 1200px;
-            padding: 2rem 3rem;
-        }
-        
-        /* Headers */
-        h1 {
-            font-size: 2.5rem !important;
-            font-weight: 700 !important;
-            background: linear-gradient(90deg, var(--primary), var(--accent));
-            -webkit-background-clip: text !important;
-            background-clip: text !important;
-            color: transparent !important;
-            margin-bottom: 1.5rem !important;
-        }
-        
-        h2 {
-            font-size: 1.75rem !important;
-            font-weight: 600 !important;
-            color: var(--text) !important;
-            margin-bottom: 1rem !important;
-        }
-        
-        h3 {
-            font-size: 1.25rem !important;
-            font-weight: 500 !important;
-            color: var(--text) !important;
-        }
-        
-        /* Buttons */
-        .stButton>button {
-            background-color: var(--primary) !important;
-            color: var(--button-text) !important;
-            border: none !important;
-            border-radius: 8px !important;
-            padding: 0.75rem 1.5rem !important;
-            font-weight: 500 !important;
-            transition: all 0.3s ease !important;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
-        }
-        
-        .stButton>button:hover {
-            background-color: var(--primary-hover) !important;
-            transform: translateY(-2px) !important;
-            box-shadow: 0 6px 12px rgba(37, 99, 235, 0.2) !important;
-        }
-        
-        /* Input fields */
-        .stTextInput>div>div>input,
-        .stTextArea>div>div>textarea {
-            background-color: var(--card-bg) !important;
-            color: var(--text) !important;
-            border: 1px solid var(--border) !important;
-            border-radius: 8px !important;
-            padding: 0.75rem 1rem !important;
-            transition: all 0.3s ease !important;
-        }
-        
-        .stTextInput>div>div>input:focus,
-        .stTextArea>div>div>textarea:focus {
-            border-color: var(--primary) !important;
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2) !important;
-        }
-        
-        /* Tabs */
-        .stTabs [aria-selected="true"] {
-            background-color: var(--primary) !important;
-            color: white !important;
-            border-radius: 8px !important;
-            font-weight: 500 !important;
-        }
-        
-        .stTabs [aria-selected="false"] {
-            color: var(--text-secondary) !important;
-        }
-        
-        /* Sidebar */
-        section[data-testid="stSidebar"] {
-            background-color: var(--card-bg) !important;
-            border-right: 1px solid var(--border) !important;
-            min-width: var(--sidebar-width) !important;
-            max-width: var(--sidebar-width) !important;
-        }
-        
-        /* Custom components */
         .header-container {
             text-align: center;
             margin-bottom: 3rem;
@@ -144,126 +54,134 @@ st.markdown("""
             padding: 2.5rem;
             border: 1px solid var(--border);
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
         }
         
-        .auth-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        .stTextInput input, .stTextInput input:focus,
+        .stTextArea textarea, .stTextArea textarea:focus {
+            background: #1E293B !important;
+            border: 1px solid var(--border) !important;
+            color: var(--text) !important;
+            padding: 12px !important;
+            border-radius: 8px !important;
+        }
+        
+        .stButton button {
+            background: var(--primary) !important;
+            color: white !important;
+            border: none !important;
+            padding: 12px 24px !important;
+            border-radius: 8px !important;
+            font-weight: 500 !important;
+            transition: all 0.2s ease !important;
+        }
+        
+        .stButton button:hover {
+            background: var(--primary-hover) !important;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stTabs [data-baseweb="tab-list"] {
+            gap: 8px;
+        }
+        
+        .stTabs [data-baseweb="tab"] {
+            padding: 12px 24px;
+            border-radius: 8px;
+            background: transparent;
+            transition: all 0.2s ease;
+        }
+        
+        .stTabs [aria-selected="true"] {
+            background: var(--primary) !important;
+            color: white !important;
+        }
+        
+        .source-item {
+            padding: 1rem;
+            margin: 0.75rem 0;
+            background: #334155;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+            transition: transform 0.2s ease;
+        }
+        
+        .source-item:hover {
+            transform: translateX(4px);
         }
         
         .user-avatar {
-            width: 64px;
-            height: 64px;
+            width: 56px;
+            height: 56px;
             border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary), var(--accent));
+            background: linear-gradient(135deg, var(--primary), #6B46C1);
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
             font-weight: bold;
-            font-size: 1.5rem;
-            margin-right: 1.5rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            font-size: 1.4rem;
+            margin-right: 1rem;
         }
         
         .response-card {
             margin-top: 2rem;
-            padding: 2rem;
-            background: var(--card-bg);
-            border-radius: 12px;
+            padding: 1.5rem;
+            background: #334155;
+            border-radius: 10px;
             border-left: 4px solid var(--primary);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
         
-        .response-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-        }
-        
-        .source-item {
-            padding: 1.25rem;
-            margin: 1rem 0;
-            background: var(--card-bg);
-            border-radius: 8px;
-            border-left: 4px solid var(--primary);
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-            border: 1px solid var(--border);
-        }
-        
-        .source-item:hover {
-            transform: translateX(8px);
-            background: rgba(37, 99, 235, 0.1);
+        /* Sidebar specific styles */
+        section[data-testid="stSidebar"] {
+            background-color: var(--card-bg) !important;
+            border-right: 1px solid var(--border) !important;
         }
         
         .feedback-container {
-            padding: 1.75rem;
+            padding: 1.5rem;
             margin-bottom: 2rem;
-            background: var(--card-bg);
-            border-radius: 12px;
-            border: 1px solid var(--border);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
         }
         
+        .feedback-title {
+            color: var(--primary) !important;
+            margin-top: 0 !important;
+        }
+        
+        .feedback-text {
+            color: var(--text-secondary) !important;
+            font-size: 0.9rem !important;
+            line-height: 1.5 !important;
+        }
+        
+        .feedback-quote {
+            color: var(--text-secondary) !important;
+            font-size: 0.85rem !important;
+            font-style: italic !important;
+        }
+        
+        /* Custom link button style */
         .link-button {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
+            display: inline-block;
             background: var(--primary);
-            color: var(--button-text) !important;
-            padding: 0.75rem 1.5rem;
+            color: white !important;
+            padding: 12px 24px;
             border-radius: 8px;
+            text-align: center;
             text-decoration: none;
             font-weight: 500;
             width: 100%;
-            transition: all 0.3s ease;
-            gap: 0.5rem;
+            transition: all 0.2s ease;
         }
         
         .link-button:hover {
             background: var(--primary-hover);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(37, 99, 235, 0.2);
-            color: var(--button-text);
-        }
-        
-        /* Animations */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .fade-in {
-            animation: fadeIn 0.5s ease forwards;
-        }
-        
-        /* Custom scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        
-        ::-webkit-scrollbar-track {
-            background: var(--bg);
-        }
-        
-        ::-webkit-scrollbar-thumb {
-            background: var(--primary);
-            border-radius: 4px;
-        }
-        
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--primary-hover);
-        }
-        
-        /* Loading spinner */
-        .stSpinner>div>div {
-            border-color: var(--primary) transparent transparent transparent !important;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            color: white;
         }
     </style>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 """, unsafe_allow_html=True)
 
 # Initialize session state
@@ -277,7 +195,7 @@ if 'logged_in' not in st.session_state:
     })
 
 # ======================
-# 2. FIREBASE INTEGRATION
+# 2. FIREBASE INTEGRATION (UPDATED)
 # ======================
 def initialize_firebase():
     if not hasattr(st, 'secrets') or "firebase" not in st.secrets:
@@ -403,20 +321,22 @@ def get_verified_response(prompt):
         return None, [f"System Error: {str(e)}"]
 
 # ======================
-# 4. AUTHENTICATION UI (UPDATED PROFESSIONAL VERSION)
+# 4. AUTHENTICATION UI (UPDATED)
 # ======================
 def show_auth_ui():
+    # Clean header without extra box
     st.markdown("""
-        <div class="header-container fade-in">
-            <h1 style="margin-bottom: 0.5rem;">
+        <div class="header-container">
+            <h1 style="color: var(--primary); font-size: 2.5rem; margin-bottom: 0.5rem;">
                 🔍 FactVerify Ai
             </h1>
-            <p style="color: var(--text-secondary); font-size: 1.1rem; max-width: 600px; margin: 0 auto;">
-                Academic-grade fact verification powered by AI
+            <p style="color: var(--text-secondary); font-size: 1.1rem;">
+                Academic-grade fact verification at your fingertips
             </p>
         </div>
     """, unsafe_allow_html=True)
     
+    # Centered auth form with cleaner design
     with st.container():
         st.markdown("<div class='auth-container'>", unsafe_allow_html=True)
         
@@ -424,9 +344,9 @@ def show_auth_ui():
         
         with tab1:
             with st.container():
-                st.markdown("<div class='auth-card fade-in'>", unsafe_allow_html=True)
+                st.markdown("<div class='auth-card'>", unsafe_allow_html=True)
                 with st.form(key="login_form"):
-                    st.markdown("<h3 style='margin-bottom: 1.5rem;'>Welcome back</h3>", unsafe_allow_html=True)
+                    st.markdown("<h3 style='color: var(--text); margin-bottom: 1.5rem;'>Welcome back</h3>", unsafe_allow_html=True)
                     
                     email = st.text_input("Email", placeholder="your@email.com", key="login_email")
                     password = st.text_input("Password", type="password", key="login_pass")
@@ -435,28 +355,27 @@ def show_auth_ui():
                     with col1:
                         if st.form_submit_button("Login", use_container_width=True):
                             if email and password:
-                                with st.spinner("Authenticating..."):
-                                    success, message, result = handle_login(email, password)
-                                    if success:
-                                        st.session_state.update({
-                                            'logged_in': True,
-                                            'email': email,
-                                            'id_token': result.get("idToken", ""),
-                                            'first_name': result.get("first_name", ""),
-                                            'last_name': result.get("last_name", "")
-                                        })
-                                        st.rerun()
-                                    else:
-                                        st.error(message)
+                                success, message, result = handle_login(email, password)
+                                if success:
+                                    st.session_state.update({
+                                        'logged_in': True,
+                                        'email': email,
+                                        'id_token': result.get("idToken", ""),
+                                        'first_name': result.get("first_name", ""),
+                                        'last_name': result.get("last_name", "")
+                                    })
+                                    st.rerun()
+                                else:
+                                    st.error(message)
                             else:
                                 st.error("Please fill all fields")
                     st.markdown("</div>", unsafe_allow_html=True)
         
         with tab2:
             with st.container():
-                st.markdown("<div class='auth-card fade-in'>", unsafe_allow_html=True)
+                st.markdown("<div class='auth-card'>", unsafe_allow_html=True)
                 with st.form(key="signup_form"):
-                    st.markdown("<h3 style='margin-bottom: 1.5rem;'>Create an account</h3>", unsafe_allow_html=True)
+                    st.markdown("<h3 style='color: var(--text); margin-bottom: 1.5rem;'>Create an account</h3>", unsafe_allow_html=True)
                     
                     col1, col2 = st.columns(2)
                     with col1:
@@ -478,31 +397,31 @@ def show_auth_ui():
                         elif password != confirm_pass:
                             st.error("Passwords don't match")
                         else:
-                            with st.spinner("Creating account..."):
-                                success, message, result = handle_signup(first_name, last_name, email, password)
-                                if success:
-                                    st.session_state.update({
-                                        'first_name': first_name,
-                                        'last_name': last_name,
-                                        'logged_in': True,
-                                        'email': email,
-                                        'id_token': result.get("idToken", "")
-                                    })
-                                    st.rerun()
-                                else:
-                                    st.error(message)
+                            success, message, result = handle_signup(first_name, last_name, email, password)
+                            if success:
+                                st.session_state.update({
+                                    'first_name': first_name,
+                                    'last_name': last_name,
+                                    'logged_in': True,
+                                    'email': email,
+                                    'id_token': result.get("idToken", "")
+                                })
+                                st.rerun()
+                            else:
+                                st.error(message)
                 st.markdown("</div>", unsafe_allow_html=True)
         
         st.markdown("</div>", unsafe_allow_html=True)
 
 # ======================
-# 5. MAIN APP UI (UPDATED PROFESSIONAL VERSION)
+# 5. MAIN APP UI (UPDATED)
 # ======================
 def show_main_app():
     first_name = st.session_state.get('first_name', '')
     last_name = st.session_state.get('last_name', '')
-    display_name = f"{first_name} {last_name[0]}." if first_name and last_name else st.session_state.email.split('@')[0]
+    display_name = f"{first_name[0].upper()}. {last_name}" if first_name else st.session_state.email.split('@')[0]
     
+    # Time-based greeting
     current_hour = datetime.now().hour
     if 5 <= current_hour < 12:
         greeting = "Good Morning"
@@ -511,17 +430,28 @@ def show_main_app():
     else:
         greeting = "Good Evening"
     
+    # Motivational messages
+    motivational_messages = [
+        "What fact shall we verify today?",
+        "Ready to uncover the truth?",
+        "Knowledge is power - let's find some!",
+        "Every search brings us closer to truth",
+        "Let's explore something fascinating!"
+    ]
+    random_message = random.choice(motivational_messages)
+    
+    # Header with greeting
     with st.container():
         col1, col2 = st.columns([5, 1])
         with col1:
             st.markdown(f"""
-                <div class="fade-in" style="display: flex; align-items: center; gap: 1.5rem; margin-bottom: 2.5rem;">
+                <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem;">
                     <div class="user-avatar">
                         {display_name[0].upper()}
                     </div>
                     <div>
-                        <h2 style="margin: 0; font-size: 1.5rem; font-weight: 600;">{greeting}, {display_name}</h2>
-                        <p style="margin: 0; color: var(--text-secondary);">Ready to verify some facts?</p>
+                        <h1 style="margin: 0; color: var(--text); font-size: 1.8rem;">{greeting}, {display_name}</h1>
+                        <p style="margin: 0; color: var(--text-secondary); font-size: 1.1rem;">{random_message}</p>
                     </div>
                 </div>
             """, unsafe_allow_html=True)
@@ -530,31 +460,32 @@ def show_main_app():
                 st.session_state.clear()
                 st.rerun()
     
+    # Feedback section in sidebar - Now with reliable link
     with st.sidebar:
         st.markdown("""
-            <div class="feedback-container fade-in">
-                <h3 class="feedback-title">Help Improve FactVerify</h3>
+            <div class="feedback-container">
+                <h3 class="feedback-title">Help Us Improve</h3>
                 <p class="feedback-text">
-                    We value your feedback to enhance your experience. Share your thoughts or report issues.
+                    Your feedback helps us enhance FactVerify Ai for everyone. Share your thoughts 
+                    about your experience, suggest improvements, or report any issues you encountered.
                 </p>
                 <p class="feedback-quote">
-                    "Precision in verification leads to clarity in understanding."
+                    "Great products are built through continuous improvement based on user feedback."
                 </p>
             </div>
         """, unsafe_allow_html=True)
         
+        # Using markdown with link styled as a button
         feedback_url = "https://docs.google.com/forms/d/e/1FAIpQLSdlh_ogw2I3hByMMGTJRFtWwAzKWklAAzFvO7g7ApinQ6jaSw/viewform"
         st.markdown(f"""
-            <a href="{feedback_url}" target="_blank" class="link-button fade-in">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-                </svg>
-                Provide Feedback
+            <a href="{feedback_url}" target="_blank" class="link-button">
+                Share Your Feedback
             </a>
         """, unsafe_allow_html=True)
     
+    # Enhanced query form
     with st.form(key="query_form"):
-        st.markdown("<h2 style='margin-bottom: 1rem;'>Research Query</h2>", unsafe_allow_html=True)
+        st.markdown("<h2 style='color: var(--text); margin-bottom: 1rem;'>Research Query</h2>", unsafe_allow_html=True)
         st.markdown("<p style='color: var(--text-secondary); margin-bottom: 1.5rem;'>Enter your question or statement to verify with academic sources</p>", unsafe_allow_html=True)
         
         prompt = st.text_area(
@@ -565,50 +496,36 @@ def show_main_app():
             label_visibility="collapsed"
         )
         
-        col1, col2 = st.columns([3, 1])
-        with col1:
-            submitted = st.form_submit_button(
-                "Verify Information", 
-                use_container_width=True,
-                type="primary"
-            )
+        submitted = st.form_submit_button("Verify Information", 
+                                        use_container_width=True,
+                                        type="primary")
         
         if submitted:
             if not prompt:
                 st.warning("Please enter a question")
             else:
-                with st.spinner("🔍 Analyzing and verifying information..."):
+                with st.spinner("🔍 Verifying with academic databases..."):
                     response, sources = get_verified_response(prompt)
                     
                     if response:
                         st.markdown(f"""
-                            <div class="response-card fade-in">
-                                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
-                                    </svg>
-                                    <h3 style="margin: 0;">Analysis Results</h3>
-                                </div>
-                                <p style="color: var(--text); font-size: 1.1rem; line-height: 1.7;">{response}</p>
+                            <div class="response-card">
+                                <p style="color: var(--text); font-size: 1.1rem; line-height: 1.6;">{response}</p>
                             </div>
                         """, unsafe_allow_html=True)
                         
                         if sources:
                             st.markdown("""
-                                <div class="fade-in" style="margin-top: 2.5rem;">
-                                    <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem;">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-                                            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
-                                        </svg>
-                                        <h3 style="margin: 0;">Verified Sources</h3>
-                                    </div>
+                                <div style="margin-top: 2rem;">
+                                    <h3 style="color: var(--text-secondary); margin-bottom: 1rem;">
+                                        📚 Verified Sources:
+                                    </h3>
                             """, unsafe_allow_html=True)
                             
                             for source in sources:
                                 st.markdown(f"""
-                                    <div class="source-item fade-in">
-                                        <p style="margin: 0; color: var(--text); font-size: 1rem; line-height: 1.6;">{source}</p>
+                                    <div class="source-item">
+                                        <p style="margin: 0; color: var(--text); font-size: 1rem;">{source}</p>
                                     </div>
                                 """, unsafe_allow_html=True)
                             
