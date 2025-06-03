@@ -14,19 +14,20 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Enhanced dark theme CSS with modern professional look
+# Elegant light theme CSS with professional look
 st.markdown("""
     <style>
         :root {
             --primary: #4A6FA5;
             --primary-hover: #3A5A8C;
             --secondary: #65676B;
-            --bg: #0E1117;
-            --card-bg: #1E293B;
-            --text: #F8FAFC;
-            --text-secondary: #94A3B8;
-            --border: #334155;
+            --bg: #FFFFFF;
+            --card-bg: #F8FAFC;
+            --text: #1E293B;
+            --text-secondary: #64748B;
+            --border: #E2E8F0;
             --success: #10B981;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
         }
         
         .stApp {
@@ -53,12 +54,12 @@ st.markdown("""
             border-radius: 12px;
             padding: 2.5rem;
             border: 1px solid var(--border);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            box-shadow: var(--shadow);
         }
         
         .stTextInput input, .stTextInput input:focus,
         .stTextArea textarea, .stTextArea textarea:focus {
-            background: #1E293B !important;
+            background: white !important;
             border: 1px solid var(--border) !important;
             color: var(--text) !important;
             padding: 12px !important;
@@ -100,10 +101,12 @@ st.markdown("""
         .source-item {
             padding: 1rem;
             margin: 0.75rem 0;
-            background: #334155;
+            background: white;
             border-radius: 8px;
             border-left: 4px solid var(--primary);
             transition: transform 0.2s ease;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
         }
         
         .source-item:hover {
@@ -127,10 +130,11 @@ st.markdown("""
         .response-card {
             margin-top: 2rem;
             padding: 1.5rem;
-            background: #334155;
+            background: white;
             border-radius: 10px;
             border-left: 4px solid var(--primary);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
         }
         
         /* Sidebar specific styles */
@@ -142,6 +146,10 @@ st.markdown("""
         .feedback-container {
             padding: 1.5rem;
             margin-bottom: 2rem;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
         }
         
         .feedback-title {
@@ -173,6 +181,7 @@ st.markdown("""
             font-weight: 500;
             width: 100%;
             transition: all 0.2s ease;
+            margin-top: 1rem;
         }
         
         .link-button:hover {
