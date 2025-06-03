@@ -14,21 +14,22 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# DeepSeek-inspired grey theme
+# DeepSeek-inspired dark grey theme with full consistency
 st.markdown("""
     <style>
         :root {
-            --primary: #4B5563;
-            --primary-hover: #374151;
+            --primary: #374151;
+            --primary-hover: #4B5563;
             --secondary: #6B7280;
-            --bg: #F9FAFB;
-            --card-bg: #FFFFFF;
-            --text: #111827;
-            --text-secondary: #6B7280;
-            --border: #E5E7EB;
+            --bg: #1F2937;
+            --card-bg: #111827;
+            --text: #F9FAFB;
+            --text-secondary: #9CA3AF;
+            --border: #374151;
             --success: #10B981;
-            --accent: #9CA3AF;
-            --highlight: #F3F4F6;
+            --accent: #6B7280;
+            --highlight: #1F2937;
+            --button-text: #FFFFFF;
         }
         
         .stApp {
@@ -38,6 +39,82 @@ st.markdown("""
             margin: 0 auto !important;
         }
         
+        /* Main content area */
+        .main .block-container {
+            background-color: var(--bg) !important;
+        }
+        
+        /* All buttons */
+        .stButton>button {
+            background-color: var(--primary) !important;
+            color: var(--button-text) !important;
+            border: 1px solid var(--border) !important;
+        }
+        
+        /* Hover state for buttons */
+        .stButton>button:hover {
+            background-color: var(--primary-hover) !important;
+            border-color: var(--secondary) !important;
+        }
+        
+        /* Selected button state */
+        .stButton>button:focus:not(:active) {
+            background-color: var(--primary) !important;
+            color: var(--button-text) !important;
+        }
+        
+        /* Text input fields */
+        .stTextInput>div>div>input,
+        .stTextArea>div>div>textarea {
+            background-color: var(--card-bg) !important;
+            color: var(--text) !important;
+            border-color: var(--border) !important;
+        }
+        
+        /* Select boxes */
+        .stSelectbox>div>div>div {
+            background-color: var(--card-bg) !important;
+            color: var(--text) !important;
+        }
+        
+        /* Tabs */
+        .stTabs [aria-selected="true"] {
+            background-color: var(--primary) !important;
+            color: var(--button-text) !important;
+        }
+        
+        .stTabs [aria-selected="false"] {
+            background-color: var(--card-bg) !important;
+            color: var(--text-secondary) !important;
+        }
+        
+        /* Radio buttons */
+        .stRadio>div>label>div:first-child {
+            background-color: var(--card-bg) !important;
+        }
+        
+        /* Checkboxes */
+        .stCheckbox>label>div:first-child {
+            background-color: var(--card-bg) !important;
+        }
+        
+        /* Sliders */
+        .stSlider>div>div>div>div {
+            background-color: var(--primary) !important;
+        }
+        
+        /* Progress bars */
+        .stProgress>div>div>div {
+            background-color: var(--primary) !important;
+        }
+        
+        /* Sidebar */
+        section[data-testid="stSidebar"] {
+            background-color: var(--card-bg) !important;
+            border-right: 1px solid var(--border) !important;
+        }
+        
+        /* Custom components */
         .header-container {
             text-align: center;
             margin-bottom: 3rem;
@@ -55,65 +132,17 @@ st.markdown("""
             border-radius: 12px;
             padding: 2.5rem;
             border: 1px solid var(--border);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-        }
-        
-        .stTextInput input, .stTextInput input:focus,
-        .stTextArea textarea, .stTextArea textarea:focus {
-            background: white !important;
-            border: 1px solid var(--border) !important;
-            color: var(--text) !important;
-            padding: 12px !important;
-            border-radius: 8px !important;
-            transition: all 0.2s ease;
-        }
-        
-        .stTextInput input:focus, 
-        .stTextArea textarea:focus {
-            border-color: var(--primary) !important;
-            box-shadow: 0 0 0 2px rgba(75, 85, 99, 0.1) !important;
-        }
-        
-        .stButton button {
-            background: var(--primary) !important;
-            color: white !important;
-            border: none !important;
-            padding: 12px 24px !important;
-            border-radius: 8px !important;
-            font-weight: 500 !important;
-            transition: all 0.2s ease !important;
-        }
-        
-        .stButton button:hover {
-            background: var(--primary-hover) !important;
-            transform: translateY(-1px);
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        
-        .stTabs [data-baseweb="tab-list"] {
-            gap: 8px;
-        }
-        
-        .stTabs [data-baseweb="tab"] {
-            padding: 12px 24px;
-            border-radius: 8px;
-            background: transparent;
-            transition: all 0.2s ease;
-        }
-        
-        .stTabs [aria-selected="true"] {
-            background: var(--primary) !important;
-            color: white !important;
         }
         
         .source-item {
             padding: 1rem;
             margin: 0.75rem 0;
-            background: white;
+            background: var(--card-bg);
             border-radius: 8px;
             border-left: 4px solid var(--primary);
             transition: transform 0.2s ease;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
             border: 1px solid var(--border);
         }
         
@@ -139,26 +168,20 @@ st.markdown("""
         .response-card {
             margin-top: 2rem;
             padding: 1.5rem;
-            background: white;
+            background: var(--card-bg);
             border-radius: 10px;
             border-left: 4px solid var(--primary);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             border: 1px solid var(--border);
-        }
-        
-        /* Sidebar specific styles */
-        section[data-testid="stSidebar"] {
-            background-color: var(--card-bg) !important;
-            border-right: 1px solid var(--border) !important;
         }
         
         .feedback-container {
             padding: 1.5rem;
             margin-bottom: 2rem;
-            background: white;
+            background: var(--card-bg);
             border-radius: 8px;
             border: 1px solid var(--border);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
         
         .feedback-title {
@@ -180,11 +203,10 @@ st.markdown("""
             padding-left: 1rem;
         }
         
-        /* Custom link button style */
         .link-button {
             display: inline-block;
             background: var(--primary);
-            color: white !important;
+            color: var(--button-text) !important;
             padding: 12px 24px;
             border-radius: 8px;
             text-align: center;
@@ -192,13 +214,14 @@ st.markdown("""
             font-weight: 500;
             width: 100%;
             transition: all 0.2s ease;
+            border: 1px solid var(--border);
         }
         
         .link-button:hover {
             background: var(--primary-hover);
             transform: translateY(-1px);
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            color: white;
+            color: var(--button-text);
         }
         
         /* Custom scrollbar */
