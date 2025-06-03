@@ -14,123 +14,116 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Improved light theme with better button visibility
+# Enhanced Light Theme with High Contrast
 st.markdown("""
     <style>
         :root {
-            --primary: #2563EB;
-            --primary-hover: #1D4ED8;
+            --primary: #1D4ED8;
+            --primary-hover: #1E40AF;
             --secondary: #3B82F6;
             --bg: #FFFFFF;
-            --card-bg: #F9FAFB;
+            --card-bg: #FFFFFF;
             --text: #111827;
-            --text-secondary: #6B7280;
+            --text-secondary: #4B5563;
             --border: #E5E7EB;
             --success: #10B981;
             --accent: #60A5FA;
             --highlight: #EFF6FF;
             --button-text: #FFFFFF;
+            --tab-inactive: #F3F4F6;
         }
         
-        .stApp {
+        /* Base styles */
+        html, body, .stApp {
             background-color: var(--bg) !important;
             color: var(--text) !important;
-            max-width: 1200px !important;
-            margin: 0 auto !important;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
         }
         
-        .header-container {
-            text-align: center;
-            margin-bottom: 3rem;
-            padding-top: 1rem;
+        /* Improved Tabs */
+        .stTabs [data-baseweb="tab-list"] {
+            gap: 0.5rem;
+            background: var(--tab-inactive);
+            padding: 0.5rem;
+            border-radius: 12px;
         }
         
-        .auth-container {
-            max-width: 500px;
-            margin: 0 auto;
-            padding: 2rem 0;
+        .stTabs [data-baseweb="tab"] {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            background: var(--tab-inactive) !important;
+            color: var(--text-secondary) !important;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            border: none;
+            margin: 0;
         }
         
+        .stTabs [aria-selected="true"] {
+            background: var(--primary) !important;
+            color: var(--button-text) !important;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stTabs [aria-selected="false"]:hover {
+            background: #E5E7EB !important;
+        }
+        
+        /* Auth Cards */
         .auth-card {
             background: var(--card-bg);
             border-radius: 12px;
             padding: 2.5rem;
             border: 1px solid var(--border);
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin-top: 1rem;
         }
         
-        /* Improved tab styling for better visibility */
-        .stTabs [data-baseweb="tab-list"] {
-            gap: 8px;
-            background: var(--card-bg);
-            padding: 4px;
-            border-radius: 8px;
-        }
-        
-        .stTabs [data-baseweb="tab"] {
-            padding: 12px 24px;
-            border-radius: 8px;
-            background: transparent;
-            transition: all 0.2s ease;
-            border: 1px solid transparent;
-        }
-        
-        .stTabs [aria-selected="true"] {
-            background: var(--primary) !important;
-            color: white !important;
-            border-color: var(--primary);
-        }
-        
-        .stTabs [aria-selected="false"] {
-            color: var(--text-secondary);
-            border: 1px solid var(--border);
-        }
-        
-        .stTextInput input, .stTextInput input:focus,
-        .stTextArea textarea, .stTextArea textarea:focus {
+        /* Input fields */
+        .stTextInput>div>div>input,
+        .stTextArea>div>div>textarea {
             background: white !important;
             border: 1px solid var(--border) !important;
             color: var(--text) !important;
-            padding: 12px !important;
+            padding: 0.75rem 1rem !important;
             border-radius: 8px !important;
         }
         
-        .stTextInput input:focus, 
-        .stTextArea textarea:focus {
+        .stTextInput>div>div>input:focus,
+        .stTextArea>div>div>textarea:focus {
             border-color: var(--primary) !important;
-            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1) !important;
+            box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.1) !important;
         }
         
-        .stButton button {
+        /* Buttons */
+        .stButton>button {
             background: var(--primary) !important;
-            color: white !important;
+            color: var(--button-text) !important;
             border: none !important;
-            padding: 12px 24px !important;
+            padding: 0.75rem 1.5rem !important;
             border-radius: 8px !important;
             font-weight: 500 !important;
             transition: all 0.2s ease !important;
+            width: 100%;
         }
         
-        .stButton button:hover {
+        .stButton>button:hover {
             background: var(--primary-hover) !important;
             transform: translateY(-1px);
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
         
-        .source-item {
-            padding: 1rem;
-            margin: 0.75rem 0;
-            background: white;
-            border-radius: 8px;
-            border-left: 4px solid var(--primary);
-            transition: transform 0.2s ease;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-            border: 1px solid var(--border);
+        /* Rest of your existing styles... */
+        .header-container {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-top: 1rem;
         }
         
-        .source-item:hover {
-            transform: translateX(4px);
-            background: var(--highlight);
+        .auth-container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 1rem 0;
         }
         
         .user-avatar {
@@ -157,7 +150,16 @@ st.markdown("""
             border: 1px solid var(--border);
         }
         
-        /* Sidebar specific styles */
+        .source-item {
+            padding: 1rem;
+            margin: 0.75rem 0;
+            background: white;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border);
+        }
+        
         section[data-testid="stSidebar"] {
             background-color: var(--card-bg) !important;
             border-right: 1px solid var(--border) !important;
@@ -172,31 +174,11 @@ st.markdown("""
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
         }
         
-        .feedback-title {
-            color: var(--primary) !important;
-            margin-top: 0 !important;
-        }
-        
-        .feedback-text {
-            color: var(--text-secondary) !important;
-            font-size: 0.9rem !important;
-            line-height: 1.5 !important;
-        }
-        
-        .feedback-quote {
-            color: var(--text-secondary) !important;
-            font-size: 0.85rem !important;
-            font-style: italic !important;
-            border-left: 3px solid var(--primary);
-            padding-left: 1rem;
-        }
-        
-        /* Custom link button style */
         .link-button {
             display: inline-block;
             background: var(--primary);
             color: white !important;
-            padding: 12px 24px;
+            padding: 0.75rem 1.5rem;
             border-radius: 8px;
             text-align: center;
             text-decoration: none;
@@ -204,33 +186,9 @@ st.markdown("""
             width: 100%;
             transition: all 0.2s ease;
         }
-        
-        .link-button:hover {
-            background: var(--primary-hover);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            color: white;
-        }
-        
-        /* Custom scrollbar */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        
-        ::-webkit-scrollbar-track {
-            background: var(--bg);
-        }
-        
-        ::-webkit-scrollbar-thumb {
-            background: var(--primary);
-            border-radius: 3px;
-        }
-        
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--primary-hover);
-        }
     </style>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 """, unsafe_allow_html=True)
 
 # Initialize session state
@@ -370,27 +328,25 @@ def get_verified_response(prompt):
         return None, [f"System Error: {str(e)}"]
 
 # ======================
-# 4. AUTHENTICATION UI (IMPROVED BUTTON VISIBILITY)
+# 4. AUTHENTICATION UI (IMPROVED VISIBILITY)
 # ======================
 def show_auth_ui():
-    # Clean header with grey theme
     st.markdown("""
         <div class="header-container">
-            <h1 style="color: var(--primary); font-size: 2.5rem; margin-bottom: 0.5rem;">
+            <h1 style="color: var(--primary); margin-bottom: 0.5rem;">
                 🔍 FactVerify Ai
             </h1>
-            <p style="color: var(--text-secondary); font-size: 1.1rem;">
+            <p style="color: var(--text-secondary);">
                 Academic-grade fact verification at your fingertips
             </p>
         </div>
     """, unsafe_allow_html=True)
     
-    # Centered auth form with improved tab visibility
     with st.container():
         st.markdown("<div class='auth-container'>", unsafe_allow_html=True)
         
-        # Use columns to make tabs more visible
-        tab1, tab2 = st.tabs(["   Login   ", "   Sign Up   "])
+        # More visible tabs with better spacing
+        tab1, tab2 = st.tabs(["  Login  ", "  Sign Up  "])
         
         with tab1:
             with st.container():
