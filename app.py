@@ -10,11 +10,11 @@ from streamlit.components.v1 import html
 st.set_page_config(
     page_title="FactVerify Ai",
     page_icon="🔍",
-    layout="wide",
-    initial_sidebar_state="expanded"
+    layout="centered",  # Changed to centered for better single-page view
+    initial_sidebar_state="collapsed"
 )
 
-# Professional light theme CSS
+# Professional light theme CSS with compact layout
 st.markdown("""
     <style>
         :root {
@@ -33,28 +33,26 @@ st.markdown("""
         .stApp {
             background-color: var(--bg) !important;
             color: var(--text) !important;
-            max-width: 1200px !important;
-            margin: 0 auto !important;
+            max-width: 500px !important;  /* Narrower for compact view */
+            padding: 1rem !important;
         }
         
         .header-container {
             text-align: center;
-            margin-bottom: 3rem;
-            padding-top: 1rem;
+            margin-bottom: 1.5rem;
         }
         
         .auth-container {
             max-width: 500px;
             margin: 0 auto;
-            padding: 2rem 0;
         }
         
         .auth-card {
             background: var(--card-bg);
             border-radius: 12px;
-            padding: 2.5rem;
+            padding: 1.5rem;
             border: 1px solid var(--border);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
         }
         
         .stTextInput input, .stTextInput input:focus,
@@ -62,134 +60,60 @@ st.markdown("""
             background: white !important;
             border: 1px solid var(--border) !important;
             color: var(--text) !important;
-            padding: 12px !important;
+            padding: 10px !important;
             border-radius: 8px !important;
+            font-size: 0.9rem !important;
         }
         
         .stButton button {
             background: var(--primary) !important;
             color: white !important;
             border: none !important;
-            padding: 12px 24px !important;
+            padding: 10px 20px !important;
             border-radius: 8px !important;
             font-weight: 500 !important;
-            transition: all 0.2s ease !important;
-            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            font-size: 0.9rem !important;
+            width: 100% !important;
+            margin-top: 0.5rem !important;
         }
         
         .stButton button:hover {
             background: var(--primary-hover) !important;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
         }
         
-        .stTabs [data-baseweb="tab-list"] {
-            gap: 8px;
+        .form-section {
+            margin-bottom: 1rem;
         }
         
-        .stTabs [data-baseweb="tab"] {
-            padding: 12px 24px;
-            border-radius: 8px;
-            background: transparent;
-            transition: all 0.2s ease;
+        .form-title {
+            font-size: 1.1rem;
+            color: var(--text);
+            margin-bottom: 0.5rem;
+            font-weight: 600;
         }
         
-        .stTabs [aria-selected="true"] {
-            background: var(--primary) !important;
-            color: white !important;
-        }
-        
-        .source-item {
-            padding: 1rem;
-            margin: 0.75rem 0;
-            background: white;
-            border-radius: 8px;
-            border-left: 4px solid var(--primary);
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-            transition: transform 0.2s ease;
-        }
-        
-        .source-item:hover {
-            transform: translateX(4px);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-        }
-        
-        .user-avatar {
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary), #7C3AED);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 1.4rem;
-            margin-right: 1rem;
-        }
-        
-        .response-card {
-            margin-top: 2rem;
-            padding: 1.5rem;
-            background: white;
-            border-radius: 10px;
-            border-left: 4px solid var(--primary);
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-        }
-        
-        /* Sidebar specific styles */
-        section[data-testid="stSidebar"] {
-            background-color: var(--card-bg) !important;
-            border-right: 1px solid var(--border) !important;
-        }
-        
-        .feedback-container {
-            padding: 1.5rem;
-            margin-bottom: 2rem;
-        }
-        
-        .feedback-title {
-            color: var(--primary) !important;
-            margin-top: 0 !important;
-        }
-        
-        .feedback-text {
-            color: var(--text-secondary) !important;
-            font-size: 0.9rem !important;
-            line-height: 1.5 !important;
-        }
-        
-        .feedback-quote {
-            color: var(--text-secondary) !important;
-            font-size: 0.85rem !important;
-            font-style: italic !important;
-        }
-        
-        /* Custom link button style */
-        .link-button {
-            display: inline-block;
-            background: var(--primary);
-            color: white !important;
-            padding: 12px 24px;
-            border-radius: 8px;
+        .switch-form {
             text-align: center;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+        
+        .switch-btn {
+            color: var(--primary);
+            cursor: pointer;
             text-decoration: none;
             font-weight: 500;
-            width: 100%;
-            transition: all 0.2s ease;
-            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
         }
         
-        .link-button:hover {
-            background: var(--primary-hover);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-            color: white;
+        /* Hide the scrollbar */
+        ::-webkit-scrollbar {
+            display: none;
         }
         
-        /* Custom error message style */
-        .stAlert [data-testid="stMarkdownContainer"] p {
-            color: var(--error) !important;
+        /* Remove extra padding */
+        .main .block-container {
+            padding-top: 1rem;
+            padding-bottom: 1rem;
         }
     </style>
 """, unsafe_allow_html=True)
@@ -201,7 +125,8 @@ if 'logged_in' not in st.session_state:
         'email': "",
         'first_name': "",
         'last_name': "",
-        'id_token': ""
+        'id_token': "",
+        'show_login': True  # Track which form to show
     })
 
 # ======================
@@ -277,152 +202,123 @@ def handle_login(email, password):
         return False, f"Connection error: {str(e)}", None
 
 # ======================
-# 3. LLM INTEGRATION
-# ======================
-def get_verified_response(prompt):
-    """Production-ready query with academic sources using Groq API"""
-    try:
-        if not hasattr(st, 'secrets') or "llama" not in st.secrets:
-            return None, ["Missing LLM API configuration"]
-            
-        headers = {
-            "Authorization": f"Bearer {st.secrets.llama.api_key}",
-            "Content-Type": "application/json"
-        }
-        
-        payload = {
-            "model": "llama3-70b-8192",
-            "messages": [
-                {
-                    "role": "system",
-                    "content": f"""You are a senior academic researcher. Provide:
-1. Accurate information current to {datetime.now().strftime('%B %Y')}
-2. 3-5 academic sources (DOIs or .edu/.gov URLs)
-3. Format: [Title](URL) - Author (Year) or DOI:..."""
-                },
-                {
-                    "role": "user",
-                    "content": prompt
-                }
-            ],
-            "temperature": 0.3,
-            "max_tokens": 2000,
-            "top_p": 0.9
-        }
-        
-        response = requests.post(
-            st.secrets.llama.api_url,
-            headers=headers,
-            json=payload,
-            timeout=60
-        )
-        
-        if response.status_code == 200:
-            content = response.json()["choices"][0]["message"]["content"]
-            if "###SOURCES###" in content:
-                parts = content.split("###SOURCES###")
-                return parts[0].strip(), [s.strip() for s in parts[1].split("\n") if s.strip()]
-            return content, []
-        
-        error_msg = response.json().get("error", {}).get("message", "Unknown API error")
-        return None, [f"API Error: {error_msg}"]
-        
-    except Exception as e:
-        return None, [f"System Error: {str(e)}"]
-
-# ======================
-# 4. AUTHENTICATION UI (Professional Light Mode)
+# 3. AUTHENTICATION UI (Single Page Compact)
 # ======================
 def show_auth_ui():
-    # Clean professional header
+    # Compact header
     st.markdown("""
         <div class="header-container">
-            <h1 style="color: var(--primary); font-size: 2.5rem; margin-bottom: 0.5rem;">
+            <h1 style="color: var(--primary); font-size: 1.8rem; margin-bottom: 0.25rem;">
                 🔍 FactVerify Ai
             </h1>
-            <p style="color: var(--text-secondary); font-size: 1.1rem;">
-                Academic-grade fact verification powered by AI
+            <p style="color: var(--text-secondary); font-size: 0.9rem;">
+                Academic-grade fact verification
             </p>
         </div>
     """, unsafe_allow_html=True)
     
-    # Centered auth form with card design
+    # Single container for both forms (only one shown at a time)
     with st.container():
         st.markdown("<div class='auth-container'>", unsafe_allow_html=True)
+        st.markdown("<div class='auth-card'>", unsafe_allow_html=True)
         
-        tab1, tab2 = st.tabs(["Login", "Create Account"])
-        
-        with tab1:
-            with st.container():
-                st.markdown("<div class='auth-card'>", unsafe_allow_html=True)
-                with st.form(key="login_form"):
-                    st.markdown("<h3 style='color: var(--text); margin-bottom: 1.5rem;'>Sign in to your account</h3>", unsafe_allow_html=True)
-                    
-                    email = st.text_input("Email", placeholder="your@email.com", key="login_email")
-                    password = st.text_input("Password", type="password", key="login_pass")
-                    
-                    if st.form_submit_button("Continue", use_container_width=True):
-                        if email and password:
-                            success, message, result = handle_login(email, password)
-                            if success:
-                                st.session_state.update({
-                                    'logged_in': True,
-                                    'email': email,
-                                    'id_token': result.get("idToken", ""),
-                                    'first_name': result.get("first_name", ""),
-                                    'last_name': result.get("last_name", "")
-                                })
-                                st.rerun()
-                            else:
-                                st.error(message)
+        if st.session_state.show_login:
+            # Login Form
+            with st.form(key="login_form"):
+                st.markdown("<div class='form-title'>Sign in to your account</div>", unsafe_allow_html=True)
+                
+                email = st.text_input("Email", placeholder="your@email.com", key="login_email")
+                password = st.text_input("Password", type="password", key="login_pass")
+                
+                if st.form_submit_button("Login", use_container_width=True):
+                    if email and password:
+                        success, message, result = handle_login(email, password)
+                        if success:
+                            st.session_state.update({
+                                'logged_in': True,
+                                'email': email,
+                                'id_token': result.get("idToken", ""),
+                                'first_name': result.get("first_name", ""),
+                                'last_name': result.get("last_name", "")
+                            })
+                            st.rerun()
                         else:
-                            st.error("Please fill all fields")
-                st.markdown("</div>", unsafe_allow_html=True)
-        
-        with tab2:
-            with st.container():
-                st.markdown("<div class='auth-card'>", unsafe_allow_html=True)
-                with st.form(key="signup_form"):
-                    st.markdown("<h3 style='color: var(--text); margin-bottom: 1.5rem;'>Create new account</h3>", unsafe_allow_html=True)
-                    
-                    col1, col2 = st.columns(2)
-                    with col1:
-                        first_name = st.text_input("First Name", placeholder="Given Name", key="signup_fname")
-                    with col2:
-                        last_name = st.text_input("Last Name", placeholder="Family Name", key="signup_lname")
-                    
-                    email = st.text_input("Email", placeholder="your@email.com", key="signup_email")
-                    
-                    col3, col4 = st.columns(2)
-                    with col3:
-                        password = st.text_input("Password", type="password", key="signup_pass")
-                    with col4:
-                        confirm_pass = st.text_input("Confirm Password", type="password", key="signup_cpass")
-                    
-                    if st.form_submit_button("Register", use_container_width=True):
-                        if not all([first_name, last_name, email, password, confirm_pass]):
-                            st.error("Please fill all fields")
-                        elif password != confirm_pass:
-                            st.error("Passwords don't match")
+                            st.error(message)
+                    else:
+                        st.error("Please fill all fields")
+                
+                st.markdown("""
+                    <div class="switch-form">
+                        Don't have an account? 
+                        <span class="switch-btn" onclick="switchToSignup()">Create one</span>
+                    </div>
+                """, unsafe_allow_html=True)
+        else:
+            # Signup Form
+            with st.form(key="signup_form"):
+                st.markdown("<div class='form-title'>Create new account</div>", unsafe_allow_html=True)
+                
+                col1, col2 = st.columns(2)
+                with col1:
+                    first_name = st.text_input("First Name", placeholder="Given Name", key="signup_fname")
+                with col2:
+                    last_name = st.text_input("Last Name", placeholder="Family Name", key="signup_lname")
+                
+                email = st.text_input("Email", placeholder="your@email.com", key="signup_email")
+                
+                col3, col4 = st.columns(2)
+                with col3:
+                    password = st.text_input("Password", type="password", key="signup_pass")
+                with col4:
+                    confirm_pass = st.text_input("Confirm Password", type="password", key="signup_cpass")
+                
+                if st.form_submit_button("Register", use_container_width=True):
+                    if not all([first_name, last_name, email, password, confirm_pass]):
+                        st.error("Please fill all fields")
+                    elif password != confirm_pass:
+                        st.error("Passwords don't match")
+                    else:
+                        success, message, result = handle_signup(first_name, last_name, email, password)
+                        if success:
+                            st.session_state.update({
+                                'first_name': first_name,
+                                'last_name': last_name,
+                                'logged_in': True,
+                                'email': email,
+                                'id_token': result.get("idToken", "")
+                            })
+                            st.rerun()
                         else:
-                            success, message, result = handle_signup(first_name, last_name, email, password)
-                            if success:
-                                st.session_state.update({
-                                    'first_name': first_name,
-                                    'last_name': last_name,
-                                    'logged_in': True,
-                                    'email': email,
-                                    'id_token': result.get("idToken", "")
-                                })
-                                st.rerun()
-                            else:
-                                st.error(message)
-                st.markdown("</div>", unsafe_allow_html=True)
+                            st.error(message)
+                
+                st.markdown("""
+                    <div class="switch-form">
+                        Already have an account? 
+                        <span class="switch-btn" onclick="switchToLogin()">Sign in</span>
+                    </div>
+                """, unsafe_allow_html=True)
         
-        st.markdown("</div>", unsafe_allow_html=True)
+        st.markdown("</div>", unsafe_allow_html=True)  # Close auth-card
+        st.markdown("</div>", unsafe_allow_html=True)  # Close auth-container
+        
+        # JavaScript to switch between forms without scrolling
+        st.markdown("""
+            <script>
+                function switchToSignup() {
+                    window.parent.document.querySelector('section.main').scrollTo(0, 0);
+                    const event = new CustomEvent('setShowLogin', {detail: false});
+                    window.parent.document.dispatchEvent(event);
+                }
+                function switchToLogin() {
+                    window.parent.document.querySelector('section.main').scrollTo(0, 0);
+                    const event = new CustomEvent('setShowLogin', {detail: true});
+                    window.parent.document.dispatchEvent(event);
+                }
+            </script>
+        """, unsafe_allow_html=True)
 
 # ======================
-# 5. MAIN APP UI (Light Mode)
+# 4. MAIN APP UI (Same as before)
 # ======================
 def show_main_app():
     first_name = st.session_state.get('first_name', '')
@@ -467,29 +363,6 @@ def show_main_app():
             if st.button("Logout", use_container_width=True, key="logout_btn"):
                 st.session_state.clear()
                 st.rerun()
-    
-    # Feedback section in sidebar
-    with st.sidebar:
-        st.markdown("""
-            <div class="feedback-container">
-                <h3 class="feedback-title">Help Us Improve</h3>
-                <p class="feedback-text">
-                    Your feedback helps us enhance FactVerify Ai for everyone. Share your thoughts 
-                    about your experience, suggest improvements, or report any issues you encountered.
-                </p>
-                <p class="feedback-quote">
-                    "Great products are built through continuous improvement based on user feedback."
-                </p>
-            </div>
-        """, unsafe_allow_html=True)
-        
-        # Using markdown with link styled as a button
-        feedback_url = "https://docs.google.com/forms/d/e/1FAIpQLSdlh_ogw2I3hByMMGTJRFtWwAzKWklAAzFvO7g7ApinQ6jaSw/viewform"
-        st.markdown(f"""
-            <a href="{feedback_url}" target="_blank" class="link-button">
-                Share Your Feedback
-            </a>
-        """, unsafe_allow_html=True)
     
     # Enhanced query form
     with st.form(key="query_form"):
@@ -543,9 +416,76 @@ def show_main_app():
                         st.error("\n".join(sources) if sources else "Unknown error occurred")
 
 # ======================
+# 5. LLM INTEGRATION
+# ======================
+def get_verified_response(prompt):
+    """Production-ready query with academic sources using Groq API"""
+    try:
+        if not hasattr(st, 'secrets') or "llama" not in st.secrets:
+            return None, ["Missing LLM API configuration"]
+            
+        headers = {
+            "Authorization": f"Bearer {st.secrets.llama.api_key}",
+            "Content-Type": "application/json"
+        }
+        
+        payload = {
+            "model": "llama3-70b-8192",
+            "messages": [
+                {
+                    "role": "system",
+                    "content": f"""You are a senior academic researcher. Provide:
+1. Accurate information current to {datetime.now().strftime('%B %Y')}
+2. 3-5 academic sources (DOIs or .edu/.gov URLs)
+3. Format: [Title](URL) - Author (Year) or DOI:..."""
+                },
+                {
+                    "role": "user",
+                    "content": prompt
+                }
+            ],
+            "temperature": 0.3,
+            "max_tokens": 2000,
+            "top_p": 0.9
+        }
+        
+        response = requests.post(
+            st.secrets.llama.api_url,
+            headers=headers,
+            json=payload,
+            timeout=60
+        )
+        
+        if response.status_code == 200:
+            content = response.json()["choices"][0]["message"]["content"]
+            if "###SOURCES###" in content:
+                parts = content.split("###SOURCES###")
+                return parts[0].strip(), [s.strip() for s in parts[1].split("\n") if s.strip()]
+            return content, []
+        
+        error_msg = response.json().get("error", {}).get("message", "Unknown API error")
+        return None, [f"API Error: {error_msg}"]
+        
+    except Exception as e:
+        return None, [f"System Error: {str(e)}"]
+
+# ======================
 # 6. APP ROUTING
 # ======================
 if not st.session_state.logged_in:
     show_auth_ui()
 else:
     show_main_app()
+
+# Handle the custom event to switch forms
+components.html("""
+    <script>
+        document.addEventListener('setShowLogin', function(e) {
+            Streamlit.setComponentValue(e.detail);
+        });
+        Streamlit.setFrameHeight(500); // Set fixed height to prevent scrolling
+    </script>
+""", height=0)
+
+if 'show_login' in st.session_state:
+    st.session_state.show_login = st.session_state.get('show_login', True)
