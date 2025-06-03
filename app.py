@@ -14,19 +14,21 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Enhanced dark theme CSS with modern professional look
+# Premium dark theme with vibrant accents for presentations
 st.markdown("""
     <style>
         :root {
-            --primary: #4A6FA5;
-            --primary-hover: #3A5A8C;
-            --secondary: #65676B;
-            --bg: #0E1117;
-            --card-bg: #1E293B;
-            --text: #F8FAFC;
-            --text-secondary: #94A3B8;
-            --border: #334155;
-            --success: #10B981;
+            --primary: #6C63FF;
+            --primary-hover: #5A52E0;
+            --secondary: #A5A7FF;
+            --bg: #121212;
+            --card-bg: #1E1E1E;
+            --text: #FFFFFF;
+            --text-secondary: #B0B0B0;
+            --border: #2E2E2E;
+            --success: #00C853;
+            --accent: #FF6584;
+            --accent-hover: #E04D6B;
         }
         
         .stApp {
@@ -34,6 +36,7 @@ st.markdown("""
             color: var(--text) !important;
             max-width: 1200px !important;
             margin: 0 auto !important;
+            background-image: radial-gradient(circle at 25% 25%, rgba(108, 99, 255, 0.15) 0%, transparent 55%);
         }
         
         .header-container {
@@ -50,19 +53,28 @@ st.markdown("""
         
         .auth-card {
             background: var(--card-bg);
-            border-radius: 12px;
+            border-radius: 16px;
             padding: 2.5rem;
             border: 1px solid var(--border);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
         }
         
         .stTextInput input, .stTextInput input:focus,
         .stTextArea textarea, .stTextArea textarea:focus {
-            background: #1E293B !important;
+            background: #2A2A2A !important;
             border: 1px solid var(--border) !important;
             color: var(--text) !important;
             padding: 12px !important;
-            border-radius: 8px !important;
+            border-radius: 12px !important;
+            transition: all 0.3s ease;
+        }
+        
+        .stTextInput input:focus, 
+        .stTextArea textarea:focus {
+            border-color: var(--primary) !important;
+            box-shadow: 0 0 0 2px rgba(108, 99, 255, 0.2) !important;
         }
         
         .stButton button {
@@ -70,15 +82,16 @@ st.markdown("""
             color: white !important;
             border: none !important;
             padding: 12px 24px !important;
-            border-radius: 8px !important;
-            font-weight: 500 !important;
-            transition: all 0.2s ease !important;
+            border-radius: 12px !important;
+            font-weight: 600 !important;
+            transition: all 0.3s ease !important;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
         
         .stButton button:hover {
             background: var(--primary-hover) !important;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(108, 99, 255, 0.25);
         }
         
         .stTabs [data-baseweb="tab-list"] {
@@ -87,78 +100,98 @@ st.markdown("""
         
         .stTabs [data-baseweb="tab"] {
             padding: 12px 24px;
-            border-radius: 8px;
+            border-radius: 12px;
             background: transparent;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
+            font-weight: 500;
         }
         
         .stTabs [aria-selected="true"] {
             background: var(--primary) !important;
             color: white !important;
+            font-weight: 600;
         }
         
         .source-item {
-            padding: 1rem;
-            margin: 0.75rem 0;
-            background: #334155;
-            border-radius: 8px;
+            padding: 1.25rem;
+            margin: 1rem 0;
+            background: #2A2A2A;
+            border-radius: 12px;
             border-left: 4px solid var(--primary);
-            transition: transform 0.2s ease;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
         
         .source-item:hover {
-            transform: translateX(4px);
+            transform: translateX(8px);
+            background: #333333;
         }
         
         .user-avatar {
-            width: 56px;
-            height: 56px;
+            width: 60px;
+            height: 60px;
             border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary), #6B46C1);
+            background: linear-gradient(135deg, var(--primary), var(--accent));
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
             font-weight: bold;
-            font-size: 1.4rem;
-            margin-right: 1rem;
+            font-size: 1.5rem;
+            margin-right: 1.5rem;
+            box-shadow: 0 4px 12px rgba(108, 99, 255, 0.3);
         }
         
         .response-card {
             margin-top: 2rem;
-            padding: 1.5rem;
-            background: #334155;
-            border-radius: 10px;
+            padding: 2rem;
+            background: #2A2A2A;
+            border-radius: 16px;
             border-left: 4px solid var(--primary);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .response-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25);
         }
         
         /* Sidebar specific styles */
         section[data-testid="stSidebar"] {
             background-color: var(--card-bg) !important;
             border-right: 1px solid var(--border) !important;
+            background-image: radial-gradient(circle at 75% 25%, rgba(108, 99, 255, 0.1) 0%, transparent 55%);
         }
         
         .feedback-container {
-            padding: 1.5rem;
+            padding: 1.75rem;
             margin-bottom: 2rem;
+            background: #2A2A2A;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
         }
         
         .feedback-title {
             color: var(--primary) !important;
             margin-top: 0 !important;
+            font-size: 1.25rem !important;
         }
         
         .feedback-text {
             color: var(--text-secondary) !important;
-            font-size: 0.9rem !important;
-            line-height: 1.5 !important;
+            font-size: 0.95rem !important;
+            line-height: 1.6 !important;
         }
         
         .feedback-quote {
-            color: var(--text-secondary) !important;
-            font-size: 0.85rem !important;
+            color: var(--secondary) !important;
+            font-size: 0.9rem !important;
             font-style: italic !important;
+            border-left: 3px solid var(--primary);
+            padding-left: 1rem;
+            margin-top: 1rem;
         }
         
         /* Custom link button style */
@@ -166,20 +199,72 @@ st.markdown("""
             display: inline-block;
             background: var(--primary);
             color: white !important;
-            padding: 12px 24px;
-            border-radius: 8px;
+            padding: 14px 28px;
+            border-radius: 12px;
             text-align: center;
             text-decoration: none;
-            font-weight: 500;
+            font-weight: 600;
             width: 100%;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-top: 1.5rem;
         }
         
         .link-button:hover {
             background: var(--primary-hover);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 12px rgba(108, 99, 255, 0.25);
             color: white;
+        }
+        
+        /* Glow effect for presentation focus */
+        .glow-effect {
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes glow {
+            from {
+                box-shadow: 0 0 5px rgba(108, 99, 255, 0.5);
+            }
+            to {
+                box-shadow: 0 0 20px rgba(108, 99, 255, 0.8);
+            }
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--card-bg);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-hover);
+        }
+        
+        /* Pulse animation for important elements */
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.02);
+            }
+            100% {
+                transform: scale(1);
+            }
         }
     </style>
 """, unsafe_allow_html=True)
@@ -195,7 +280,7 @@ if 'logged_in' not in st.session_state:
     })
 
 # ======================
-# 2. FIREBASE INTEGRATION (UPDATED)
+# 2. FIREBASE INTEGRATION
 # ======================
 def initialize_firebase():
     if not hasattr(st, 'secrets') or "firebase" not in st.secrets:
@@ -321,22 +406,23 @@ def get_verified_response(prompt):
         return None, [f"System Error: {str(e)}"]
 
 # ======================
-# 4. AUTHENTICATION UI (UPDATED)
+# 4. AUTHENTICATION UI
 # ======================
 def show_auth_ui():
-    # Clean header without extra box
+    # Vibrant header with accent colors
     st.markdown("""
         <div class="header-container">
-            <h1 style="color: var(--primary); font-size: 2.5rem; margin-bottom: 0.5rem;">
-                🔍 FactVerify Ai
+            <h1 style="color: var(--primary); font-size: 2.75rem; margin-bottom: 0.5rem;">
+                🔍 <span style="background: linear-gradient(135deg, var(--primary), var(--accent)); 
+                -webkit-background-clip: text; background-clip: text; color: transparent;">FactVerify Ai</span>
             </h1>
-            <p style="color: var(--text-secondary); font-size: 1.1rem;">
+            <p style="color: var(--text-secondary); font-size: 1.2rem;">
                 Academic-grade fact verification at your fingertips
             </p>
         </div>
     """, unsafe_allow_html=True)
     
-    # Centered auth form with cleaner design
+    # Centered auth form with premium design
     with st.container():
         st.markdown("<div class='auth-container'>", unsafe_allow_html=True)
         
@@ -414,7 +500,7 @@ def show_auth_ui():
         st.markdown("</div>", unsafe_allow_html=True)
 
 # ======================
-# 5. MAIN APP UI (UPDATED)
+# 5. MAIN APP UI
 # ======================
 def show_main_app():
     first_name = st.session_state.get('first_name', '')
@@ -446,7 +532,7 @@ def show_main_app():
         with col1:
             st.markdown(f"""
                 <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem;">
-                    <div class="user-avatar">
+                    <div class="user-avatar pulse">
                         {display_name[0].upper()}
                     </div>
                     <div>
@@ -460,10 +546,10 @@ def show_main_app():
                 st.session_state.clear()
                 st.rerun()
     
-    # Feedback section in sidebar - Now with reliable link
+    # Feedback section in sidebar
     with st.sidebar:
         st.markdown("""
-            <div class="feedback-container">
+            <div class="feedback-container glow-effect">
                 <h3 class="feedback-title">Help Us Improve</h3>
                 <p class="feedback-text">
                     Your feedback helps us enhance FactVerify Ai for everyone. Share your thoughts 
